@@ -1,8 +1,6 @@
 
 /*
-    Roka.h - Shitty HAL za STM32H750
-    ---------------------------------
-    I FUCKING HATE STMicroelectronics
+   badhal.h - Shitty HAL za STM32H750
 */
 #pragma once
 #include <stddef.h>
