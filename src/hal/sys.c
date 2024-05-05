@@ -1,11 +1,5 @@
 #include "badhal.h"
 
-#define SCB_AIRCR_VECTKEY_Pos 16U
-#define SCB_AIRCR_VECTKEY_Msk (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)
-
-#define SCB_AIRCR_PRIGROUP_Pos 8U
-#define SCB_AIRCR_PRIGROUP_Msk (7UL << SCB_AIRCR_PRIGROUP_Pos)
-
 void sys_set_priority_grouping(u32 priority)
 {
     volatile u32 reg = SCB->AIRCR;
@@ -29,14 +23,6 @@ void sys_nvic_set_priority(i32 irq_n, u32 prio)
     }
 }
 
-#define RCC_CR_HSION 1
-#define SCB_CPARCR_FULL_ACCESS_EVERYTHING 0x0FFFFFFFUL
-
-#define RCC_AHB2ENR_SRAM1EN (1UL << 29)
-#define RCC_AHB2ENR_SRAM2EN (1UL << 30)
-#define RCC_AHB2ENR_SRAM3EN (1UL << 31)
-
-#define RCC_AHB3ENR_FMCEN (1UL << 12)
 // im gonna cry
 void sys_init_ext_mem()
 {
@@ -183,12 +169,6 @@ void sys_init_ext_mem()
     (void)(tmp);
 }
 
-#define SysTick_CTRL_CLKSOURCE (1UL << 2)
-
-#define SysTick_CTRL_TICKINT (1 << 1)
-
-#define SysTick_CTRL_ENABLE 1
-
 void sys_set_systick(u32 tick)
 {
     SysTick->LOAD = tick - 1;
@@ -245,11 +225,124 @@ void sys_delay_ms(u32 time)
 {
     u32 start = tick;
 
-    if (time < 0xffffffff) time++;
+    if (time < 0xffffffff)
+        time++;
 
     while ((tick - start) < time)
     {
     }
+}
+
+// Enable LDO
+void sys_power_ldo()
+{
+    PWR->CR3 = (PWR->CR3 & ~(PWR_SUPPLY_CONFIG_MASK)) | PWR_SUPPLY_LDO;
+
+    // wait for voltage level
+    while (!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY))
+    {
+    }
+}
+
+void sys_init_oscilator()
+{
+    // enable HSE
+    RCC->CR |= RCC_CR_HSEON;
+    // wait for HSE
+    while (!(RCC->CR & RCC_CR_HSERDY))
+    {
+    }
+
+    // disable PLL1
+    RCC->CR &= ~RCC_CR_PLL1ON;
+    // wait for PLL1
+    while (RCC->CR & RCC_CR_PLL1RDY)
+    {
+    }
+    // Disable HSI and CSI ??
+    // RCC->CR &= ~(RCC_CR_HSION | RCC_CR_CSION);
+
+    // Disable PLLFRACN
+    RCC->PLLCFGR &= ~(RCC_PLLCFGR_PLL1FRACEN);
+
+    // PLL1 Config part 1
+    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~(RCC_PLLSOURCE_Mask | RCC_PLLSOURCE_DIVM1_Mask)) |
+                     (5 << RCC_PLLSOURCE_DIVM1_Pos) |
+                     RCC_PLLSOURCE_HSE;
+
+    RCC->PLL1DIVR = (1 << RCC_PLL1DIVR_DIVR_Pos) |
+                    (3 << RCC_PLL1DIVR_DIVQ_Pos) |
+                    (1 << RCC_PLL1DIVR_DIVP_Pos) |
+                    (159 << RCC_PLL1DIVR_DIVN_Pos);
+
+    // set FRACN1 to 0
+    RCC->PLL1FRACR = RCC->PLL1FRACR & ~(RCC_PLL1FRACR_FRACN1_Mask);
+
+    // set VCIRANGE to 4-8MHz and VCORANGE to Wide (0)
+    RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL1RGE_Mask | RCC_PLLCFGR_PLL1VCOSEL_Mask)) |
+                   (0x2 << RCC_PLLCFGR_PLL1RGE_Pos);
+
+    // enable PLL1P, PLL1Q, PLL1R,
+    RCC->PLLCFGR |= RCC_PLLCFGR_DIVP1EN | RCC_PLLCFGR_DIVQ1EN |
+                    RCC_PLLCFGR_DIVR1EN;
+    // enable PLL
+    RCC->CR |= RCC_CR_PLL1ON;
+    // wait for PLL1
+    while (!(RCC->CR & RCC_CR_PLL1RDY))
+    {
+    }
+}
+
+void sys_clk_config()
+{
+    // check FLASH_ACR_LATENCY
+    // check all RDY flags
+
+    // RCC_CLOCKTYPE_D1PCLK1
+    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    // RCC_CLOCKTYPE_PCLK1
+    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    // RCC_CLOCKTYPE_PCLK2
+    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE2_Mask) | RCC_DxCFGR_DxPPRE2_DIV2;
+    // RCC_CLOCKTYPE_D3PCLK1
+    RCC->D3CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    // RCC_CLOCKTYPE_HCLK
+    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_HPRE_Mask) | RCC_D1CFGR_HPRE_DIV2;
+    // RCC_CLOCKTYPE_SYSCLK
+    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_D1CPRE_Mask) | RCC_D1CFGR_D1CPRE_DIV1;
+
+    // Switch system clock source (or die trying)
+    RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW_Mask) | RCC_CFGR_SW_PLL1;
+    while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1)
+    {
+        // welp
+    }
+
+    // Set FLASH latencty
+    // FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCTY_Mask) | 4; // todo remove?
+}
+
+void sys_go_fast()
+{
+    volatile u32 tmp;
+    sys_power_ldo();
+    sys_init_oscilator();
+    sys_clk_config();
+
+    sys_set_systick(400000); // trust me
+
+    // activate CSI clock mondatory for I/O Compensation Cell
+    RCC->CR |= RCC_CR_CSION;
+
+    // Enable SYSCFG clock mondatory for I/O Compensation Cell
+    RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
+    // tiny delay
+    tmp = RCC->APB4ENR & RCC_APB4ENR_SYSCFGEN;
+
+    // Enables the I/O Compensation Cell
+    SYSCFG->CCCSR |= SYSCFG_CCCSR_EN;
+
+    (void)tmp;
 }
 
 void sys_lateinit()
@@ -257,11 +350,5 @@ void sys_lateinit()
     // NVIC Group
     sys_set_priority_grouping(3); // what the sigma?
 
-    // systick
     sys_set_systick(64000);
-}
-
-void sys_go_fast()
-{
-    // 400MHz
 }

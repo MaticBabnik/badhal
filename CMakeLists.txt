@@ -26,7 +26,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O2 -gdwarf -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O0 -gdwarf -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
 
 # Choose the relevant FPU option
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=soft") # No FP
