@@ -179,9 +179,13 @@ void sys_set_systick(u32 tick)
 
 void sys_earlyinit()
 {
-    volatile u32 tmp;
+    // volatile u32 tmp;
+
+    // default flash latency
+    FLASH->ACR = (FLASH->ACR & ~(0xful)) | 7;
+
     // this should enable FPU access?
-    SCB->CPACR |= SCB_CPARCR_FULL_ACCESS_EVERYTHING;
+    SCB->CPACR &= ~(SCB_CPARCR_FULL_ACCESS_EVERYTHING);
 
     // reset a bunch of clock related shit
     RCC->CR |= RCC_CR_HSION;
@@ -203,11 +207,24 @@ void sys_earlyinit()
     RCC->CIER = 0x00000000;
 
     // D2 SRAM????
-    RCC->AHB2ENR |= (RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN | RCC_AHB2ENR_SRAM3EN);
-    tmp = RCC->AHB2ENR;
-    (void)tmp;
+    // RCC->AHB2ENR |= (RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN | RCC_AHB2ENR_SRAM3EN);
+    // tmp = RCC->AHB2ENR;
+    //(void)tmp;
 
-    sys_init_ext_mem();
+    // unhinged shit: if stm32h7 revY
+    if (((*((u32 *)0x5C001000ul)) & 0xFFFF0000U) < 0x20000000U)
+    {
+        // Change the switch matrix read issuing capability to 1
+        // for the AXI SRAM target (Target 7) (i have no clue what this means)
+        *((volatile u32 *)0x51008108) = 0x000000001U;
+    }
+
+    RCC->APB4ENR |= 2; // SYSCFG enable ???
+
+    // Disable the FMC bank1 (enabled after reset).
+    // This, prevents CPU speculation access on this bank which blocks the use of FMC during
+    // 24us. During this time the others FMC master (such as LTDC) cannot use it!
+    FMC_Bank1_R->BTCR[0] = 0x000030D2;
 }
 
 volatile u32 tick = 0;
@@ -233,21 +250,41 @@ void sys_delay_ms(u32 time)
     }
 }
 
+#define SYSCFG_PWRCR_ODEN 1ul
+#define PWR_D3CR_VOS (0x3UL << 14)
+#define PWR_REGULATOR_VOLTAGE_SCALE1 (0x3UL << 14)
+
 // Enable LDO
 void sys_power_ldo()
 {
+    volatile u32 tmp;
     PWR->CR3 = (PWR->CR3 & ~(PWR_SUPPLY_CONFIG_MASK)) | PWR_SUPPLY_LDO;
-
-    // wait for voltage level
+    tmp = PWR->CR3;
     while (!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY))
     {
+        // wait for voltage level
     }
+    // disable overdrive
+    SYSCFG->PWRCR &= ~SYSCFG_PWRCR_ODEN;
+    tmp = SYSCFG->PWRCR;
+
+    // set VOS to 0b11
+    PWR->D3CR |= 0xc000;
+    tmp = PWR->D3CR;
+
+    while ((PWR->D3CR & (1u << 13)) == 0)
+    {
+        // wait for VOSRDY
+    }
+
+    (void)tmp;
 }
 
 void sys_init_oscilator()
 {
-    // enable HSE
-    RCC->CR |= RCC_CR_HSEON;
+    // enable clocks
+    RCC->CR |= RCC_CR_HSEON | RCC_CR_HSI48ON | RCC_CR_HSION;
+    RCC->CSR |= 1; // enable LSI
     // wait for HSE
     while (!(RCC->CR & RCC_CR_HSERDY))
     {
@@ -276,7 +313,7 @@ void sys_init_oscilator()
                     (159 << RCC_PLL1DIVR_DIVN_Pos);
 
     // set FRACN1 to 0
-    RCC->PLL1FRACR = RCC->PLL1FRACR & ~(RCC_PLL1FRACR_FRACN1_Mask);
+    RCC->PLL1FRACR = 0;
 
     // set VCIRANGE to 4-8MHz and VCORANGE to Wide (0)
     RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL1RGE_Mask | RCC_PLLCFGR_PLL1VCOSEL_Mask)) |
@@ -284,7 +321,7 @@ void sys_init_oscilator()
 
     // enable PLL1P, PLL1Q, PLL1R,
     RCC->PLLCFGR |= RCC_PLLCFGR_DIVP1EN | RCC_PLLCFGR_DIVQ1EN |
-                    RCC_PLLCFGR_DIVR1EN;
+                    RCC_PLLCFGR_DIVR1EN | RCC_PLLCFGR_PLL1FRACEN;
     // enable PLL
     RCC->CR |= RCC_CR_PLL1ON;
     // wait for PLL1
@@ -295,31 +332,24 @@ void sys_init_oscilator()
 
 void sys_clk_config()
 {
-    // check FLASH_ACR_LATENCY
-    // check all RDY flags
+    // FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x37; // cloning whatever ST does
 
-    // RCC_CLOCKTYPE_D1PCLK1
+    RCC->D1CFGR = (RCC->D1CFGR & ~(0xful)) | (0x8ul); // HCPRE div by 2
     RCC->D1CFGR = (RCC->D1CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
-    // RCC_CLOCKTYPE_PCLK1
-    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
-    // RCC_CLOCKTYPE_PCLK2
-    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE2_Mask) | RCC_DxCFGR_DxPPRE2_DIV2;
-    // RCC_CLOCKTYPE_D3PCLK1
-    RCC->D3CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
-    // RCC_CLOCKTYPE_HCLK
-    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_HPRE_Mask) | RCC_D1CFGR_HPRE_DIV2;
-    // RCC_CLOCKTYPE_SYSCLK
     RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_D1CPRE_Mask) | RCC_D1CFGR_D1CPRE_DIV1;
+    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE2_Mask) | RCC_DxCFGR_DxPPRE2_DIV2;
+    RCC->D3CFGR = (RCC->D3CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
 
     // Switch system clock source (or die trying)
     RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW_Mask) | RCC_CFGR_SW_PLL1;
     while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1)
     {
+        RCC->CFGR = 3;
         // welp
     }
 
     // Set FLASH latencty
-    // FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCTY_Mask) | 4; // todo remove?
 }
 
 void sys_go_fast()

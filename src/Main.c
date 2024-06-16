@@ -20,11 +20,12 @@ void led_write(bool x)
 void glavno()
 {
     sys_earlyinit();
-    mem_mpu_setup_sdram();
+    // mem_mpu_setup_sdram();
     mem_enable_icache();
     sys_lateinit();
-    sys_go_fast();
+    // sys_go_fast();
     led_setup();
+
 
     for (;;)
     {
