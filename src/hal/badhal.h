@@ -34,7 +34,6 @@ struct GPIO_t
     u32 AFRH;
 };
 
-
 // cancer ass struct
 struct RCC_t
 {
@@ -142,63 +141,63 @@ struct RCC_t
 
 struct SCB_t
 {
-    R_RO u32 CPUID;       /*!< Offset: 0x000 (R/ )  CPUID Base Register */
-    R_RW u32 ICSR;        /*!< Offset: 0x004 (R/W)  Interrupt Control and State Register */
-    R_RW u32 VTOR;        /*!< Offset: 0x008 (R/W)  Vector Table Offset Register */
-    R_RW u32 AIRCR;       /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset Control Register */
-    R_RW u32 SCR;         /*!< Offset: 0x010 (R/W)  System Control Register */
-    R_RW u32 CCR;         /*!< Offset: 0x014 (R/W)  Configuration Control Register */
-    R_RW u8 SHPR[12U];    /*!< Offset: 0x018 (R/W)  System Handlers Priority Registers (4-7, 8-11, 12-15) */
-    R_RW u32 SHCSR;       /*!< Offset: 0x024 (R/W)  System Handler Control and State Register */
-    R_RW u32 CFSR;        /*!< Offset: 0x028 (R/W)  Configurable Fault Status Register */
-    R_RW u32 HFSR;        /*!< Offset: 0x02C (R/W)  HardFault Status Register */
-    R_RW u32 DFSR;        /*!< Offset: 0x030 (R/W)  Debug Fault Status Register */
-    R_RW u32 MMFAR;       /*!< Offset: 0x034 (R/W)  MemManage Fault Address Register */
-    R_RW u32 BFAR;        /*!< Offset: 0x038 (R/W)  BusFault Address Register */
-    R_RW u32 AFSR;        /*!< Offset: 0x03C (R/W)  Auxiliary Fault Status Register */
-    R_RO u32 ID_PFR[2U];  /*!< Offset: 0x040 (R/ )  Processor Feature Register */
-    R_RO u32 ID_DFR;      /*!< Offset: 0x048 (R/ )  Debug Feature Register */
-    R_RO u32 ID_AFR;      /*!< Offset: 0x04C (R/ )  Auxiliary Feature Register */
-    R_RO u32 ID_MFR[4U];  /*!< Offset: 0x050 (R/ )  Memory Model Feature Register */
-    R_RO u32 ID_ISAR[5U]; /*!< Offset: 0x060 (R/ )  Instruction Set Attributes Register */
+    R_RO u32 CPUID;
+    R_RW u32 ICSR;
+    R_RW u32 VTOR;
+    R_RW u32 AIRCR;
+    R_RW u32 SCR;
+    R_RW u32 CCR;
+    R_RW u8 SHPR[12U];
+    R_RW u32 SHCSR;
+    R_RW u32 CFSR;
+    R_RW u32 HFSR;
+    R_RW u32 DFSR;
+    R_RW u32 MMFAR;
+    R_RW u32 BFAR;
+    R_RW u32 AFSR;
+    R_RO u32 ID_PFR[2U];
+    R_RO u32 ID_DFR;
+    R_RO u32 ID_AFR;
+    R_RO u32 ID_MFR[4U];
+    R_RO u32 ID_ISAR[5U];
     u32 reserved0[1U];
 
-    R_RO u32 CLIDR;  /*!< Offset: 0x078 (R/ )  Cache Level ID register */
-    R_RO u32 CTR;    /*!< Offset: 0x07C (R/ )  Cache Type register */
-    R_RO u32 CCSIDR; /*!< Offset: 0x080 (R/ )  Cache Size ID Register */
-    R_RW u32 CSSELR; /*!< Offset: 0x084 (R/W)  Cache Size Selection Register */
-    R_RW u32 CPACR;  /*!< Offset: 0x088 (R/W)  Coprocessor Access Control Register */
+    R_RO u32 CLIDR;
+    R_RO u32 CTR;
+    R_RO u32 CCSIDR;
+    R_RW u32 CSSELR;
+    R_RW u32 CPACR;
     u32 reserved3[93U];
 
-    R_WO u32 STIR; /*!< Offset: 0x200 ( /W)  Software Triggered Interrupt Register */
+    R_WO u32 STIR;
     u32 reserved4[15U];
 
-    R_RO u32 MVFR0; /*!< Offset: 0x240 (R/ )  Media and VFP Feature Register 0 */
-    R_RO u32 MVFR1; /*!< Offset: 0x244 (R/ )  Media and VFP Feature Register 1 */
-    R_RO u32 MVFR2; /*!< Offset: 0x248 (R/ )  Media and VFP Feature Register 2 */
+    R_RO u32 MVFR0;
+    R_RO u32 MVFR1;
+    R_RO u32 MVFR2;
     u32 reserved5[1U];
 
-    R_WO u32 ICIALLU; /*!< Offset: 0x250 ( /W)  I-Cache Invalidate All to PoU */
+    R_WO u32 ICIALLU;
     u32 reserved6[1U];
 
-    R_WO u32 ICIMVAU;  /*!< Offset: 0x258 ( /W)  I-Cache Invalidate by MVA to PoU */
-    R_WO u32 DCIMVAC;  /*!< Offset: 0x25C ( /W)  D-Cache Invalidate by MVA to PoC */
-    R_WO u32 DCISW;    /*!< Offset: 0x260 ( /W)  D-Cache Invalidate by Set-way */
-    R_WO u32 DCCMVAU;  /*!< Offset: 0x264 ( /W)  D-Cache Clean by MVA to PoU */
-    R_WO u32 DCCMVAC;  /*!< Offset: 0x268 ( /W)  D-Cache Clean by MVA to PoC */
-    R_WO u32 DCCSW;    /*!< Offset: 0x26C ( /W)  D-Cache Clean by Set-way */
-    R_WO u32 DCCIMVAC; /*!< Offset: 0x270 ( /W)  D-Cache Clean and Invalidate by MVA to PoC */
-    R_WO u32 DCCISW;   /*!< Offset: 0x274 ( /W)  D-Cache Clean and Invalidate by Set-way */
+    R_WO u32 ICIMVAU;
+    R_WO u32 DCIMVAC;
+    R_WO u32 DCISW;
+    R_WO u32 DCCMVAU;
+    R_WO u32 DCCMVAC;
+    R_WO u32 DCCSW;
+    R_WO u32 DCCIMVAC;
+    R_WO u32 DCCISW;
     u32 reserved7[6U];
 
-    R_RW u32 ITCMCR; /*!< Offset: 0x290 (R/W)  Instruction Tightly-Coupled Memory Control Register */
-    R_RW u32 DTCMCR; /*!< Offset: 0x294 (R/W)  Data Tightly-Coupled Memory Control Registers */
-    R_RW u32 AHBPCR; /*!< Offset: 0x298 (R/W)  AHBP Control Register */
-    R_RW u32 CACR;   /*!< Offset: 0x29C (R/W)  L1 Cache Control Register */
-    R_RW u32 AHBSCR; /*!< Offset: 0x2A0 (R/W)  AHB Slave Control Register */
+    R_RW u32 ITCMCR;
+    R_RW u32 DTCMCR;
+    R_RW u32 AHBPCR;
+    R_RW u32 CACR;
+    R_RW u32 AHBSCR;
     u32 reserved8[1U];
 
-    R_RW u32 ABFSR; /*!< Offset: 0x2A8 (R/W)  Auxiliary Bus Fault Status Register */
+    R_RW u32 ABFSR;
 };
 
 struct MPU_t
@@ -376,8 +375,6 @@ static volatile struct GPIO_t *const GPIOJ = (void *)0x58022400;
 static volatile struct GPIO_t *const GPIOK = (void *)0x58022800;
 static volatile struct RCC_t *const RCC = (void *)0x58024400;
 static volatile struct PWR_t *const PWR = (void *)0x58024800;
-
-
 
 static volatile struct SysTick_t *const SysTick = (void *)0xE000E010;
 static volatile struct NVIC_t *const NVIC = (void *)0xE000E100;

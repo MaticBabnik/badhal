@@ -19,12 +19,15 @@ void led_write(bool x)
 
 void entry()
 {
+    // don't mess with ordering around here too much
     sys_earlyinit();
-    mem_mpu_setup_sdram();
-    mem_enable_icache();
-    sys_lateinit();
-    sys_go_fast();
-    led_setup();
+    mem_mpu_setup_sdram(); // mounts external RAM
+    mem_enable_icache(); // instruction cache
+    //TODO: data cache
+    sys_lateinit(); // (sets up 64MHz systick)
+    sys_go_fast();  // (switches to PLL1@400MHz, fixes systick)
+    
+    led_setup();    
 
 
     for (;;)
