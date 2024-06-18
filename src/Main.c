@@ -17,13 +17,13 @@ void led_write(bool x)
     GPIOI->BSRR = x ? LED_ON : LED_OFF;
 }
 
-void glavno()
+void entry()
 {
     sys_earlyinit();
-    // mem_mpu_setup_sdram();
+    mem_mpu_setup_sdram();
     mem_enable_icache();
     sys_lateinit();
-    // sys_go_fast();
+    sys_go_fast();
     led_setup();
 
 

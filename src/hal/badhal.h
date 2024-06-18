@@ -34,15 +34,16 @@ struct GPIO_t
     u32 AFRH;
 };
 
+
 // cancer ass struct
 struct RCC_t
 {
     u32 CR;
-    u32 ICSCR;
-    u32 HSICFGR;
+    u32 HSISCR;
     u32 CRRCR;
     u32 CSICFGR;
     u32 CFGR;
+    u32 __reserved00;
     u32 D1CFGR;
     u32 D2CFGR;
     u32 D3CFGR;
@@ -376,6 +377,8 @@ static volatile struct GPIO_t *const GPIOK = (void *)0x58022800;
 static volatile struct RCC_t *const RCC = (void *)0x58024400;
 static volatile struct PWR_t *const PWR = (void *)0x58024800;
 
+
+
 static volatile struct SysTick_t *const SysTick = (void *)0xE000E010;
 static volatile struct NVIC_t *const NVIC = (void *)0xE000E100;
 static volatile struct SCB_t *const SCB = (void *)0xE000ED00;
@@ -432,6 +435,19 @@ static volatile struct MPU_t *const MPU = (void *)0xE000ED90;
 
 #define RCC_CR_HSION 1UL
 #define RCC_CR_CSION (1UL << 7)
+#define RCC_CR_HSEON (1UL << 16)
+#define RCC_CR_PLL1ON (1UL << 24)
+#define RCC_CR_HSI48ON (1UL << 12)
+#define RCC_CSR_LSION 1UL
+
+// RCC_CR_CSION
+#define RCC_CR_HSIRDY (1UL << 2)
+#define RCC_CR_CSIRDY (1UL << 8)
+#define RCC_CR_HSERDY (1UL << 17)
+#define RCC_CR_PLL1RDY (1UL << 25)
+#define RCC_CR_HSI48RDY (1UL << 13)
+#define RCC_CSR_LSIRDY (1UL << 1)
+
 #define SCB_CPARCR_FULL_ACCESS_EVERYTHING 0x0FFFFFFFUL
 
 #define RCC_AHB2ENR_SRAM1EN (1UL << 29)
@@ -450,13 +466,6 @@ static volatile struct MPU_t *const MPU = (void *)0xE000ED90;
 #define PWR_SUPPLY_CONFIG_MASK 0x7UL
 #define PWR_SUPPLY_LDO 0x2
 #define PWR_CSR1_ACTVOSRDY (1 << 13)
-
-#define RCC_CR_HSEON (1UL << 16)
-#define RCC_CR_HSERDY (1UL << 17)
-#define RCC_CR_HSI48ON (1UL << 12)
-
-#define RCC_CR_PLL1ON (1UL << 24)
-#define RCC_CR_PLL1RDY (1UL << 25)
 
 #define RCC_PLLSOURCE_HSE (0x2UL)
 #define RCC_PLLSOURCE_Mask (0x3UL)

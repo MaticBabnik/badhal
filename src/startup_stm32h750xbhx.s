@@ -95,7 +95,7 @@ LoopFillZerobss:
 
 /* Call the application's entry point.*/
 //eternal:  b  eternal
-  bl  glavno
+  bl  entry
   bx  lr
 
 .size  Reset_Handler, .-Reset_Handler

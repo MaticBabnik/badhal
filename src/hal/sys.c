@@ -264,8 +264,8 @@ void sys_power_ldo()
     {
         // wait for voltage level
     }
-    // disable overdrive
-    SYSCFG->PWRCR &= ~SYSCFG_PWRCR_ODEN;
+    // ~~disable~~ enable overdrive
+    SYSCFG->PWRCR |= SYSCFG_PWRCR_ODEN;
     tmp = SYSCFG->PWRCR;
 
     // set VOS to 0b11
@@ -282,57 +282,66 @@ void sys_power_ldo()
 
 void sys_init_oscilator()
 {
-    // enable clocks
+    // all the oscilators
     RCC->CR |= RCC_CR_HSEON | RCC_CR_HSI48ON | RCC_CR_HSION;
-    RCC->CSR |= 1; // enable LSI
-    // wait for HSE
-    while (!(RCC->CR & RCC_CR_HSERDY))
+    RCC->CSR |= RCC_CSR_LSION;
+
+    // wait for them
+    while (!(
+        (RCC->CR & (RCC_CR_HSERDY | RCC_CR_HSI48ON | RCC_CR_HSION)) |
+        (RCC->CSR & RCC_CSR_LSIRDY)))
     {
     }
 
     // disable PLL1
     RCC->CR &= ~RCC_CR_PLL1ON;
-    // wait for PLL1
+    // wait for PLL1 to unlock
     while (RCC->CR & RCC_CR_PLL1RDY)
     {
     }
-    // Disable HSI and CSI ??
-    // RCC->CR &= ~(RCC_CR_HSION | RCC_CR_CSION);
 
-    // Disable PLLFRACN
-    RCC->PLLCFGR &= ~(RCC_PLLCFGR_PLL1FRACEN);
+    // --- Init PLL1 ---
+    // Select clock source (HSE)
+    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLSOURCE_Mask) | RCC_PLLSOURCE_HSE;
 
-    // PLL1 Config part 1
-    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~(RCC_PLLSOURCE_Mask | RCC_PLLSOURCE_DIVM1_Mask)) |
-                     (5 << RCC_PLLSOURCE_DIVM1_Pos) |
-                     RCC_PLLSOURCE_HSE;
-
-    RCC->PLL1DIVR = (1 << RCC_PLL1DIVR_DIVR_Pos) |
-                    (3 << RCC_PLL1DIVR_DIVQ_Pos) |
-                    (1 << RCC_PLL1DIVR_DIVP_Pos) |
-                    (159 << RCC_PLL1DIVR_DIVN_Pos);
-
-    // set FRACN1 to 0
-    RCC->PLL1FRACR = 0;
+    // pre-divide by 5
+    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLSOURCE_DIVM1_Mask) |
+                     (5 << RCC_PLLSOURCE_DIVM1_Pos);
 
     // set VCIRANGE to 4-8MHz and VCORANGE to Wide (0)
     RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL1RGE_Mask | RCC_PLLCFGR_PLL1VCOSEL_Mask)) |
                    (0x2 << RCC_PLLCFGR_PLL1RGE_Pos);
 
-    // enable PLL1P, PLL1Q, PLL1R,
+    // Disable fractional part
+    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLL1FRACEN;
+
+    // Enable dividers
     RCC->PLLCFGR |= RCC_PLLCFGR_DIVP1EN | RCC_PLLCFGR_DIVQ1EN |
-                    RCC_PLLCFGR_DIVR1EN | RCC_PLLCFGR_PLL1FRACEN;
+                    RCC_PLLCFGR_DIVR1EN;
+
+    // Set dividers
+    RCC->PLL1DIVR = (1 << RCC_PLL1DIVR_DIVR_Pos) |
+                    (3 << RCC_PLL1DIVR_DIVQ_Pos) |
+                    (1 << RCC_PLL1DIVR_DIVP_Pos) |
+                    (159 << RCC_PLL1DIVR_DIVN_Pos);
+
+    // sej ni vazn ~~set FRACN1 to 0~~
+    // RCC->PLL1FRACR = 0;
+
     // enable PLL
     RCC->CR |= RCC_CR_PLL1ON;
+
     // wait for PLL1
     while (!(RCC->CR & RCC_CR_PLL1RDY))
     {
     }
 }
 
+
 void sys_clk_config()
 {
-    // FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x37; // cloning whatever ST does
+    // 7 waits states, 2 for the other thing, idk
+    FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x27; 
 
     RCC->D1CFGR = (RCC->D1CFGR & ~(0xful)) | (0x8ul); // HCPRE div by 2
     RCC->D1CFGR = (RCC->D1CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
@@ -342,11 +351,10 @@ void sys_clk_config()
     RCC->D3CFGR = (RCC->D3CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
 
     // Switch system clock source (or die trying)
-    RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW_Mask) | RCC_CFGR_SW_PLL1;
+    RCC->CFGR |= RCC_CFGR_SW_PLL1;
     while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1)
     {
-        RCC->CFGR = 3;
-        // welp
+
     }
 
     // Set FLASH latencty

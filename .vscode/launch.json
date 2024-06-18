@@ -10,7 +10,11 @@
             "runToEntryPoint": "main",
             "showDevDebugOutput": "raw",
             "servertype": "stlink",
-            "svdFile": "${workspaceFolder}/STM32H750X.svd"
+            "svdFile": "${workspaceFolder}/STM32H750X.svd",
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 4
+            }
             //"servertype": "openocd",
             // "svdFile": "STM32H750X.svd",
             // "device": "STM32H750X",
