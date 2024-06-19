@@ -7,14 +7,14 @@ void mem_mpu_enable(u32 ctrl)
     // Enable fault exceptions
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA;
     // sync data & flush instruction pipeline
-    asm volatile("dsb");
-    asm volatile("isb");
+    a_dsb();
+    a_isb();
 }
 
 void mem_mpu_disable()
 {
     // finish up all memory accesses
-    asm volatile("dmb");
+    a_dmb();
     // Disable fault exceptions
     SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA;
     // Disable MPU
@@ -38,12 +38,12 @@ void mem_mpu_setup_sdram()
 
 void mem_enable_icache()
 {
-    asm volatile("dsb");
-    asm volatile("isb");
+    a_dsb();
+    a_isb();
     SCB->ICIALLU = 0; // invalidate I-cache
-    asm volatile("dsb");
-    asm volatile("isb");
+    a_dsb();
+    a_isb();
     SCB->CCR |= SCB_CCR_IC; // enable I-cache
-    asm volatile("dsb");
-    asm volatile("isb");
+    a_dsb();
+    a_isb();
 }

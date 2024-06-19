@@ -250,10 +250,6 @@ void sys_delay_ms(u32 time)
     }
 }
 
-#define SYSCFG_PWRCR_ODEN 1ul
-#define PWR_D3CR_VOS (0x3UL << 14)
-#define PWR_REGULATOR_VOLTAGE_SCALE1 (0x3UL << 14)
-
 // Enable LDO
 void sys_power_ldo()
 {

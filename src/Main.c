@@ -7,7 +7,7 @@
 void led_setup()
 {
     // Enable GPIOI Peripheral Clock
-    RCC->AHB4ENR |= GPIOIEN;
+    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOIEN;
     // Make GPIOI Pin13 as output pin (bits 27:26 in MODER register)
     GPIOI->MODER = (GPIOI->MODER & 0xF3FFFFFF) | 0x04000000;
 }
