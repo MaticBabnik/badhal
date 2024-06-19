@@ -2,7 +2,7 @@
 
 void mem_mpu_enable(u32 ctrl)
 {
-    // Enable MPU
+    // Enable MPUs
     MPU->CTRL = ctrl | MPU_CTRL_ENABLE;
     // Enable fault exceptions
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA;
@@ -36,14 +36,3 @@ void mem_mpu_setup_sdram()
     mem_mpu_enable(MPU_PRIVILEGED_DEFAULT);
 }
 
-void mem_enable_icache()
-{
-    a_dsb();
-    a_isb();
-    SCB->ICIALLU = 0; // invalidate I-cache
-    a_dsb();
-    a_isb();
-    SCB->CCR |= SCB_CCR_IC; // enable I-cache
-    a_dsb();
-    a_isb();
-}

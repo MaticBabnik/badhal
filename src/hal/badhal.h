@@ -40,6 +40,8 @@ static volatile struct NVIC_t *const NVIC = (void *)0xE000E100;
 static volatile struct SCB_t *const SCB = (void *)0xE000ED00;
 static volatile struct MPU_t *const MPU = (void *)0xE000ED90;
 
+#include "cache.h"
+
 #define SDRAM_BASE 0xD0000000
 
 void sys_earlyinit();
@@ -48,5 +50,10 @@ u32 sys_get_tick();
 void sys_delay_ms();
 void sys_go_fast();
 
+void sys_icache_enable();
+void sys_dcache_enable();
+void sys_dcache_flush();
+void sys_dcache_invalidate();
+void sys_dcache_disable();
+
 void mem_mpu_setup_sdram();
-void mem_enable_icache();

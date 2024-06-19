@@ -65,7 +65,9 @@ struct SCB_t
 
 #define SCB_SHCSR_MEMFAULTENA (1UL << 16)
 
-#define SCB_CCR_IC (1 << 17)
+#define SCB_CCR_DC (1UL << 16)
+#define SCB_CCR_IC (1UL << 17)
+#define SCB_CCR_BP (1UL << 18)
 
 #define SCB_AIRCR_VECTKEY_Pos 16U
 #define SCB_AIRCR_VECTKEY_Msk (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)

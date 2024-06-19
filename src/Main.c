@@ -21,9 +21,15 @@ void entry()
 {
     // don't mess with ordering around here too much
     sys_earlyinit();
+    
+    sys_icache_enable();
+    // this shit hangs
+    // fuckt tbnraishik0u-=ee=
+    // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAA
+    sys_dcache_invalidate();
+    sys_dcache_enable();
+
     mem_mpu_setup_sdram(); // mounts external RAM
-    mem_enable_icache(); // instruction cache
-    //TODO: data cache
     sys_lateinit(); // (sets up 64MHz systick)
     sys_go_fast();  // (switches to PLL1@400MHz, fixes systick)
     

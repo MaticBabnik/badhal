@@ -333,11 +333,10 @@ void sys_init_oscilator()
     }
 }
 
-
 void sys_clk_config()
 {
     // 7 waits states, 2 for the other thing, idk
-    FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x27; 
+    FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x27;
 
     RCC->D1CFGR = (RCC->D1CFGR & ~(0xful)) | (0x8ul); // HCPRE div by 2
     // mess around with domain clocks... i think this is relavant for peripherals
@@ -351,7 +350,6 @@ void sys_clk_config()
     RCC->CFGR |= RCC_CFGR_SW_PLL1;
     while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1)
     {
-
     }
 
     // Set FLASH latencty
