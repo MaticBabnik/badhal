@@ -4,6 +4,8 @@
 #define R_WO volatile       // write-only
 #define R_RO volatile const // read-only
 
+#define B_INLINE static inline __attribute__((always_inline))
+
 typedef signed char i8;
 typedef unsigned char u8;
 typedef short i16;

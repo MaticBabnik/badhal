@@ -5,7 +5,7 @@ A Hobby-grade HAL for the STM32-H750-disco board.
 ## Features
 
 - [ ] Logging over serial
-- [ ] Data cache
+- [x] Data cache
 - [x] Instruction cache
 - [x] SysTick based `sys_delay_ms`
 - [x] 400 MHz system clock
