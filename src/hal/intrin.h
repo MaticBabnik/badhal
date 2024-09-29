@@ -6,3 +6,4 @@ ARM pseudo-intrinsics
 B_INLINE void a_dmb() { asm volatile("dmb"); }
 B_INLINE void a_isb() { asm volatile("isb"); }
 B_INLINE void a_dsb() { asm volatile("dsb"); }
+B_INLINE void a_nop() { asm volatile("nop"); }

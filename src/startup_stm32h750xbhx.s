@@ -94,10 +94,8 @@ LoopFillZerobss:
   bcc FillZerobss
 
 /* Call the application's entry point.*/
-//eternal:  b  eternal
   bl  entry
   bx  lr
-
 .size  Reset_Handler, .-Reset_Handler
 
 

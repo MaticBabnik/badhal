@@ -24,6 +24,7 @@ void sys_nvic_set_priority(i32 irq_n, u32 prio)
 }
 
 // im gonna cry
+//TODO use the gpio_init_alt_mask() function
 void sys_init_ext_mem()
 {
     volatile u32 tmp;
@@ -35,8 +36,8 @@ void sys_init_ext_mem()
     tmp = (RCC->AHB4ENR);
 
     /* Connect PDx pins to FMC Alternate function */
-    GPIOD->AFRL = 0x000000CC;
-    GPIOD->AFRH = 0xCC000CCC;
+    GPIOD->AFR[0] = 0x000000CC;
+    GPIOD->AFR[1] = 0xCC000CCC;
     /* Configure PDx pins in Alternate function mode */
     GPIOD->MODER = 0xAFEAFFFA;
     /* Configure PDx pins speed to 100 MHz */
@@ -47,8 +48,8 @@ void sys_init_ext_mem()
     GPIOD->PUPDR = 0x50150005;
 
     /* Connect PEx pins to FMC Alternate function */
-    GPIOE->AFRL = 0xC00000CC;
-    GPIOE->AFRH = 0xCCCCCCCC;
+    GPIOE->AFR[0] = 0xC00000CC;
+    GPIOE->AFR[1] = 0xCCCCCCCC;
     /* Configure PEx pins in Alternate function mode */
     GPIOE->MODER = 0xAAAABFFA;
     /* Configure PEx pins speed to 100 MHz */
@@ -59,8 +60,8 @@ void sys_init_ext_mem()
     GPIOE->PUPDR = 0x55554005;
 
     /* Connect PFx pins to FMC Alternate function */
-    GPIOF->AFRL = 0x00CCCCCC;
-    GPIOF->AFRH = 0xCCCCC000;
+    GPIOF->AFR[0] = 0x00CCCCCC;
+    GPIOF->AFR[1] = 0xCCCCC000;
     /* Configure PFx pins in Alternate function mode */
     GPIOF->MODER = 0xAABFFAAA;
     /* Configure PFx pins speed to 100 MHz */
@@ -71,8 +72,8 @@ void sys_init_ext_mem()
     GPIOF->PUPDR = 0x55400555;
 
     /* Connect PGx pins to FMC Alternate function */
-    GPIOG->AFRL = 0x00CC00CC;
-    GPIOG->AFRH = 0xC000000C;
+    GPIOG->AFR[0] = 0x00CC00CC;
+    GPIOG->AFR[1] = 0xC000000C;
     /* Configure PGx pins in Alternate function mode */
     GPIOG->MODER = 0xBFFEFAFA;
     /* Configure PGx pins speed to 100 MHz */
@@ -83,8 +84,8 @@ void sys_init_ext_mem()
     GPIOG->PUPDR = 0x40010505;
 
     /* Connect PHx pins to FMC Alternate function */
-    GPIOH->AFRL = 0xCCC00000;
-    GPIOH->AFRH = 0xCCCCCCCC;
+    GPIOH->AFR[0] = 0xCCC00000;
+    GPIOH->AFR[1] = 0xCCCCCCCC;
     /* Configure PHx pins in Alternate function mode */
     GPIOH->MODER = 0xAAAAABFF;
     /* Configure PHx pins speed to 100 MHz */
@@ -169,8 +170,15 @@ void sys_init_ext_mem()
     (void)(tmp);
 }
 
+u32 coreFreq = 64000000; //Hz
+
+u32 sys_get_freq() {
+    return coreFreq;
+}
+
 void sys_set_systick(u32 tick)
 {
+    // update systick
     SysTick->LOAD = tick - 1;
     sys_nvic_set_priority(-1, 7);
     SysTick->VAL = 0;
@@ -363,6 +371,7 @@ void sys_go_fast()
     sys_clk_config();
 
     sys_set_systick(400000); // trust me
+    coreFreq = 400000000;
 
     // activate CSI clock mondatory for I/O Compensation Cell
     RCC->CR |= RCC_CR_CSION;

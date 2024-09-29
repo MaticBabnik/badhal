@@ -10,9 +10,9 @@ struct PWR_t
     R_RW u32 CR2;
     R_RW u32 CR3;
     R_RW u32 CPUCR;
-    u32 RESERVED0;
+    u32 __reserved0;
     R_RW u32 D3CR;
-    u32 RESERVED1;
+    u32 __reserved1;
     R_RW u32 WKUPCR;
     R_RW u32 WKUPFR;
     R_RW u32 WKUPEPR;

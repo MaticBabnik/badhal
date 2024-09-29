@@ -1,46 +1,40 @@
 #include "hal/badhal.h"
-#include <stdbool.h>
+#include "hal/debug.h"
 
-#define LED_OFF 0x00002000
-#define LED_ON 0x20000000
+#include "HD44780.h"
 
-void led_setup()
+#define SWO_2MHZ 2000000
+
+int main()
 {
-    // Enable GPIOI Peripheral Clock
-    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOIEN;
-    // Make GPIOI Pin13 as output pin (bits 27:26 in MODER register)
-    GPIOI->MODER = (GPIOI->MODER & 0xF3FFFFFF) | 0x04000000;
-}
+    gpio_init_all_ports();
+    gpio_init_output(GPIOI, 13, None, Low, PushPull);
+    gpio_init_output(GPIOJ, 2, None, Low, PushPull);
+    gpio_init_output(GPIOD, 3, None, Low, PushPull);
+    gpio_init_input(GPIOC, 13, None);
 
-void led_write(bool x)
-{
-    GPIOI->BSRR = x ? LED_ON : LED_OFF;
+    hd44780_init();
+    hd44790_puts("Hello, world!");
+
+    for (;;)
+    {
+        gpio_toggle(GPIOI, 13);
+        gpio_toggle(GPIOJ, 2);
+        gpio_put(GPIOD, 3, gpio_read(GPIOC, 13));
+        swo_writestr("Hello SWO.\n");
+        sys_delay_ms(100);
+    }
 }
 
 void entry()
 {
     // don't mess with ordering around here too much
     sys_earlyinit();
-    
     sys_icache_enable();
-    // this shit hangs
-    // fuckt tbnraishik0u-=ee=
-    // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAA
-    sys_dcache_invalidate();
     sys_dcache_enable();
-
     mem_mpu_setup_sdram(); // mounts external RAM
-    sys_lateinit(); // (sets up 64MHz systick)
-    sys_go_fast();  // (switches to PLL1@400MHz, fixes systick)
-    
-    led_setup();    
-
-
-    for (;;)
-    {
-        led_write(1);
-        sys_delay_ms(500);
-        led_write(0);
-        sys_delay_ms(500);
-    }
+    sys_lateinit();        // (sets up 64MHz systick)
+    sys_go_fast();         // (switches to PLL1@400MHz, fixes systick)
+    swo_init(SWO_2MHZ);    // enable SWO logging
+    main();
 }

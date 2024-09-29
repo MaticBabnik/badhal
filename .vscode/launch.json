@@ -3,26 +3,37 @@
     "configurations": [
         {
             "name": "Cortex Debug",
-            "cwd": "${workspaceFolder}",
-            "executable": "./build/starter",
-            "request": "launch",
             "type": "cortex-debug",
-            "runToEntryPoint": "main",
-            "showDevDebugOutput": "raw",
-            "servertype": "stlink",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            // "showDevDebugOutput": false,
+
+            "servertype": "openocd",
+            "runToEntryPoint": "entry",
+            "executable": "./build/starter",
+            
+            "device": "STM32H750X",
             "svdFile": "${workspaceFolder}/STM32H750X.svd",
+            "configFiles": ["board/stm32h750b-disco.cfg"],
+
             "liveWatch": {
                 "enabled": true,
                 "samplesPerSecond": 4
+            },
+
+            "swoConfig": {
+                "enabled": true,
+                "source": "probe",
+                "swoFrequency": 2000,
+                "cpuFrequency": 400000,
+                "decoders": [
+                    {
+                        "type": "console",
+                        "label": "ITM",
+                        "port": 1
+                    }
+                ]
             }
-            //"servertype": "openocd",
-            // "svdFile": "STM32H750X.svd",
-            // "device": "STM32H750X",
-            // "configFiles": [
-            // "target/stm32h7x.cfg",
-            // "interface/cmsis-dap.cfg",
-            // "board/stm32h750b-disco.cfg"
-            // ]
         }
     ]
 }

@@ -11,6 +11,9 @@ set(SIZE "${TOOL_PREFIX}size")
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(MyProject C CXX ASM)
 
 file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.s" "${CMAKE_SOURCE_DIR}/src/*.c")
@@ -26,7 +29,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O3 -flto -gdwarf -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O2 -flto -gdwarf -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
 
 # Shouldn't affect projects that don't use FP at all
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=hard -mfpu=fpv5-d16") 

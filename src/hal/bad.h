@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdbool.h>
 
 #define R_RW volatile       // read-write
 #define R_WO volatile       // write-only

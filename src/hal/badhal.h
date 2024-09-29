@@ -16,29 +16,41 @@
 #include "hw/scb.h"
 #include "hw/syscfg.h"
 #include "hw/systick.h"
+#include "hw/ltdc.h"
+#include "hw/dma2d.h"
+#include "hw/debug.h"
 
-// Peripherals
-static volatile struct FLASH_t *const FLASH = (void *)0x52002000;
-static volatile struct FMC_Bank1_t *const FMC_Bank1_R = (void *)0x52004000;
-static volatile struct FMC_Bank5_6_t *const FMC_Bank5_6_R = (void *)0x52004140;
-static volatile struct SYSCFG_t *const SYSCFG = (void *)0x58000400;
-static volatile struct GPIO_t *const GPIOA = (void *)0x58020000;
-static volatile struct GPIO_t *const GPIOB = (void *)0x58020400;
-static volatile struct GPIO_t *const GPIOC = (void *)0x58020800;
-static volatile struct GPIO_t *const GPIOD = (void *)0x58020C00;
-static volatile struct GPIO_t *const GPIOE = (void *)0x58021000;
-static volatile struct GPIO_t *const GPIOF = (void *)0x58021400;
-static volatile struct GPIO_t *const GPIOG = (void *)0x58021800;
-static volatile struct GPIO_t *const GPIOH = (void *)0x58021C00;
-static volatile struct GPIO_t *const GPIOI = (void *)0x58022000;
-static volatile struct GPIO_t *const GPIOJ = (void *)0x58022400;
-static volatile struct GPIO_t *const GPIOK = (void *)0x58022800;
-static volatile struct RCC_t *const RCC = (void *)0x58024400;
-static volatile struct PWR_t *const PWR = (void *)0x58024800;
-static volatile struct SysTick_t *const SysTick = (void *)0xE000E010;
-static volatile struct NVIC_t *const NVIC = (void *)0xE000E100;
-static volatile struct SCB_t *const SCB = (void *)0xE000ED00;
-static volatile struct MPU_t *const MPU = (void *)0xE000ED90;
+#define PERIPHERAL_DEF(_type_, _name_, _address_) static struct _type_ *const _name_ = (void *)_address_
+
+PERIPHERAL_DEF(LTDC_t, LTDC, 0x50001000);
+PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer1, 0x50001084);
+PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer2, 0x50001104);
+PERIPHERAL_DEF(DMA2D_t, DMA2D, 0x52001000);
+PERIPHERAL_DEF(FLASH_t, FLASH, 0x52002000);
+PERIPHERAL_DEF(FMC_Bank1_t, FMC_Bank1_R, 0x52004000);
+PERIPHERAL_DEF(FMC_Bank5_6_t, FMC_Bank5_6_R, 0x52004140);
+PERIPHERAL_DEF(SYSCFG_t, SYSCFG, 0x58000400);
+PERIPHERAL_DEF(GPIO_t, GPIOA, 0x58020000);
+PERIPHERAL_DEF(GPIO_t, GPIOB, 0x58020400);
+PERIPHERAL_DEF(GPIO_t, GPIOC, 0x58020800);
+PERIPHERAL_DEF(GPIO_t, GPIOD, 0x58020C00);
+PERIPHERAL_DEF(GPIO_t, GPIOE, 0x58021000);
+PERIPHERAL_DEF(GPIO_t, GPIOF, 0x58021400);
+PERIPHERAL_DEF(GPIO_t, GPIOG, 0x58021800);
+PERIPHERAL_DEF(GPIO_t, GPIOH, 0x58021C00);
+PERIPHERAL_DEF(GPIO_t, GPIOI, 0x58022000);
+PERIPHERAL_DEF(GPIO_t, GPIOJ, 0x58022400);
+PERIPHERAL_DEF(GPIO_t, GPIOK, 0x58022800);
+PERIPHERAL_DEF(RCC_t, RCC, 0x58024400);
+PERIPHERAL_DEF(PWR_t, PWR, 0x58024800);
+PERIPHERAL_DEF(DBGMCU_t, DBGMCU, 0x5C001000);
+PERIPHERAL_DEF(ITM_t, ITM, 0xE0000000);
+PERIPHERAL_DEF(SysTick_t, SysTick, 0xE000E010);
+PERIPHERAL_DEF(NVIC_t, NVIC, 0xE000E100);
+PERIPHERAL_DEF(SCB_t, SCB, 0xE000ED00);
+PERIPHERAL_DEF(MPU_t, MPU, 0xE000ED90);
+PERIPHERAL_DEF(CoreDebug_t, CoreDebug, 0xE000EDF0);
+PERIPHERAL_DEF(TPI_t, TPI, 0xE0040000);
 
 #include "cache.h"
 
@@ -49,6 +61,7 @@ void sys_lateinit();
 u32 sys_get_tick();
 void sys_delay_ms();
 void sys_go_fast();
+u32 sys_get_freq();
 
 void sys_icache_enable();
 void sys_dcache_enable();

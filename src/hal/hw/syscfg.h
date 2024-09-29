@@ -5,18 +5,18 @@
 
 struct SYSCFG_t
 {
-    u32 RESERVED1;
+    u32 __reserved1;
     R_RW u32 PMCR;
     R_RW u32 EXTICR[4];
     R_RW u32 CFGR;
-    u32 RESERVED2;
+    u32 __reserved2;
     R_RW u32 CCCSR;
     R_RW u32 CCVR;
     R_RW u32 CCCR;
     R_RW u32 PWRCR;
-    u32 RESERVED3[61];
+    u32 __reserved3[61];
     R_RW u32 PKGR;
-    u32 RESERVED4[118];
+    u32 __reserved4[118];
     R_RW u32 UR0;
     R_RW u32 UR1;
     R_RW u32 UR2;
