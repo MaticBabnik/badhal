@@ -1,4 +1,8 @@
 {
     "cmake.configureOnOpen": false,
-    "cortex-debug.variableUseNaturalFormat": false
+    "cortex-debug.variableUseNaturalFormat": false,
+    "files.associations": {
+        "bad.h": "c",
+        "intrin.h": "c"
+    }
 }

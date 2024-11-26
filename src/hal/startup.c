@@ -2,7 +2,7 @@
 #include "./intrin.h"
 
 #pragma GCC push_options
-#pragma GCC optimize ("O0")
+#pragma GCC optimize("O0")
 
 extern u32 _sidata; // Start of initialization values for .data
 extern u32 _sdata;  // Start of .data section in SRAM
@@ -12,7 +12,7 @@ extern u32 _ebss;   // End of .bss section
 extern u32 _estack; // Stack top
 extern void entry() __attribute__((noinline));
 
-#define INTPROTO(__name__) void __name__() __attribute__((weak,noinline,alias("Default_Handler")));
+#define INTPROTO(__name__) void __name__() __attribute__((weak, noinline, alias("Default_Handler")));
 
 void Reset_Handler()
 {
@@ -189,7 +189,7 @@ INTPROTO(WAKEUP_PIN_IRQHandler)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 __attribute__((section(".isr_vector"), used)) volatile void (*const g_pfnVectors[])() = {
-    (void (*)(void))&_estack,
+    (void (*)(void)) & _estack,
     Reset_Handler,
     NMI_Handler,
     HardFault_Handler,

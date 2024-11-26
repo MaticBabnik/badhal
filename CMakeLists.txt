@@ -16,7 +16,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(MyProject C CXX ASM)
 
-file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" )
+file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" "${CMAKE_SOURCE_DIR}/src/*.s")
 
 # Replace .s extension with .o for object files
 foreach(source ${srcs})
