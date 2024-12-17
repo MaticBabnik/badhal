@@ -5,9 +5,18 @@
 .set GPIO_MODE_OUT,     0x1
 .set GPIOI_BASE,        0x58022000
 .set RCC_AHB4ENR,       0x580244E0
+.set SysTick,           0xE000E010
+.set SysTick_CTRL,      0x0
+.set SysTick_LOAD,      0x4
+.set SysTick_CTRL_EN,   1
+.set SysTick_CTRL_EXT,  4
+.set SysTick_CTRL_CF,   (1 << 16)
+
+.set MILISECOND,        63999
 .set DELAY_MS,          32000
 // Variables (and big constants)
 .section .data
+// .syntax unified
 
 
 // Code
@@ -39,6 +48,24 @@ fn_gpio_init:
 
     pop {r0-r2, pc}
 
+
+fn_systick_init:
+    push {r0-r2,lr}
+    ldr r0, =SysTick
+    
+    ldr r1, =MILISECOND
+    str r1, [r0, #SysTick_LOAD]
+
+    ldr r1, [r0, #SysTick_CTRL]
+    mov r2, #SysTick_CTRL_EN
+    orr r1, r2
+    mov r2, #SysTick_CTRL_EXT
+    orr r1, r2
+    
+    str r1, [r0, #SysTick_CTRL]
+
+    pop {r0-r2,pc}
+    
 
 fn_gpio_on:
     push {r0-r1, lr}
@@ -78,15 +105,34 @@ delay_loopi:
 
     pop {r1,r2, pc}
 
+fn_delay_systick:
+    push {r1-r3, lr}
+    ldr r1, =SysTick
+    ldr r2, =SysTick_CTRL_CF
+
+delays_loop:
+    ldr r3, [r1, #SysTick_CTRL]
+    
+    tst r3, r2
+    beq delays_loop
+    
+    sub r0, #1
+    cmp r0, #0
+    bne delays_loop
+
+    pop {r1-r3, pc}
+
+
 entry:
     bl fn_gpio_init
+    bl fn_systick_init
 loop:
     bl fn_gpio_on
     ldr r0, =#500
-    bl fn_delay
+    bl fn_delay_systick
     bl fn_gpio_off
     ldr r0, =#500
-    bl fn_delay
+    bl fn_delay_systick
 
 b loop
 
