@@ -9,6 +9,7 @@
 .set SysTick_CTRL,      0x0
 .set SysTick_LOAD,      0x4
 .set SysTick_CTRL_EN,   1
+.set SysTick_CTRL_TICKINT,   2
 .set SysTick_CTRL_EXT,  4
 .set SysTick_CTRL_CF,   (1 << 16)
 
@@ -16,13 +17,43 @@
 .set DELAY_MS,          32000
 // Variables (and big constants)
 .section .data
-// .syntax unified
 
+lstate: .word 0
+cnt: .word 1
 
 // Code
 .section .text
 .thumb
 .global entry
+.global SysTick_Handler
+.align 4
+.type SysTick_Handler, %function
+SysTick_Handler:
+    push {r0-r4, lr}
+
+    ldr r0, =lstate
+    ldr r1, [r0, #4]
+
+    sub r1, #1
+    str r1, [r0, #4]
+    cmp r1, #0
+
+    bne SysTick_exit
+    ldr r1, =500
+    str r1, [r0, #4]
+
+    ldr r1, [r0]
+    cmp r1, #0
+    mvn r1, r1
+    str r1, [r0]
+    bne SysTick_skip
+    bl fn_gpio_on
+    b SysTick_exit
+SysTick_skip: 
+    bl fn_gpio_off
+
+SysTick_exit: 
+    pop  {r0-r4, pc}
 
 fn_gpio_init:
     push {r0-r2, lr}
@@ -60,6 +91,8 @@ fn_systick_init:
     mov r2, #SysTick_CTRL_EN
     orr r1, r2
     mov r2, #SysTick_CTRL_EXT
+    orr r1, r2
+    mov r2, #SysTick_CTRL_TICKINT
     orr r1, r2
     
     str r1, [r0, #SysTick_CTRL]
@@ -126,13 +159,7 @@ delays_loop:
 entry:
     bl fn_gpio_init
     bl fn_systick_init
-loop:
-    bl fn_gpio_on
-    ldr r0, =#500
-    bl fn_delay_systick
-    bl fn_gpio_off
-    ldr r0, =#500
-    bl fn_delay_systick
-
-b loop
+loop: 
+    nop
+    b loop
 
