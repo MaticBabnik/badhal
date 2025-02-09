@@ -1,7 +1,7 @@
 #pragma once
 #include "badhal.h"
 
-B_INLINE void sys_icache_enable()
+INLINE_ALWAYS void sys_icache_enable()
 {
     a_dsb();
     a_isb();
@@ -13,7 +13,7 @@ B_INLINE void sys_icache_enable()
     a_isb();
 }
 
-B_INLINE void sys_dcache_invalidate()
+INLINE_ALWAYS void sys_dcache_invalidate()
 {
     SCB->CSSELR = SCB_CSSELR_D_L1;
     a_dsb();
@@ -33,7 +33,7 @@ B_INLINE void sys_dcache_invalidate()
     a_dsb();
 }
 
-B_INLINE void sys_dcache_enable()
+INLINE_ALWAYS void sys_dcache_enable()
 {
     if (SCB->CCR & SCB_CCR_DC)
         return;
@@ -46,7 +46,7 @@ B_INLINE void sys_dcache_enable()
     a_isb();
 }
 
-B_INLINE void sys_dcache_flush()
+INLINE_ALWAYS void sys_dcache_flush()
 {
     SCB->CSSELR = SCB_CSSELR_D_L1;
     a_dsb();
@@ -67,7 +67,7 @@ B_INLINE void sys_dcache_flush()
     a_isb();
 }
 
-B_INLINE void sys_dcache_disable()
+INLINE_ALWAYS void sys_dcache_disable()
 {
     SCB->CSSELR = SCB_CSSELR_D_L1;
     a_dsb();

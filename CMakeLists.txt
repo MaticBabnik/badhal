@@ -29,7 +29,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O3 -flto -gdwarf -ffreestanding -fno-builtin -nostdlib -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O0 -flto -gdwarf -ffreestanding -fno-builtin -nostdlib -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
 
 # Shouldn't affect projects that don't use FP at all
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=hard -mfpu=fpv5-d16") 

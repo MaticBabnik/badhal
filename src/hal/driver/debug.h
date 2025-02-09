@@ -1,4 +1,4 @@
-#include "badhal.h"
+#include "../badhal.h"
 
 void swo_init(u32 swo_freq);
 void swo_putc(char c);

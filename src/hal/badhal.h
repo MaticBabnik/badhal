@@ -6,20 +6,20 @@
 #include "bad.h"
 #include "intrin.h"
 
-#include "hw/flash.h"
-#include "hw/fmc.h"
-#include "hw/gpio.h"
-#include "hw/mpu.h"
-#include "hw/nvic.h"
-#include "hw/pwr.h"
-#include "hw/rcc.h"
-#include "hw/scb.h"
-#include "hw/syscfg.h"
-#include "hw/systick.h"
-#include "hw/ltdc.h"
-#include "hw/dma2d.h"
-#include "hw/debug.h"
-#include "hw/usart.h"
+#include "hwdef/flash.h"
+#include "hwdef/fmc.h"
+#include "hwdef/gpio.h"
+#include "hwdef/mpu.h"
+#include "hwdef/nvic.h"
+#include "hwdef/pwr.h"
+#include "hwdef/rcc.h"
+#include "hwdef/scb.h"
+#include "hwdef/syscfg.h"
+#include "hwdef/systick.h"
+#include "hwdef/ltdc.h"
+#include "hwdef/dma2d.h"
+#include "hwdef/debug.h"
+#include "hwdef/usart.h"
 
 #define PERIPHERAL_DEF(_type_, _name_, _address_) static struct _type_ *const _name_ = (void *)_address_
 
@@ -72,3 +72,4 @@ void sys_dcache_invalidate();
 void sys_dcache_disable();
 
 void mem_mpu_setup_sdram();
+void sys_trap(volatile char *msg);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hal/badhal.h"
+#include "../../hal/badhal.h"
 /*
     PK1,PA8,PE6,PI8 -> LCD Data transmission
     PE3             -> Register Select

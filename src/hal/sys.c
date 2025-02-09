@@ -1,5 +1,12 @@
 #include "badhal.h"
 
+INLINE_NEVER void sys_trap(volatile char *msg)
+{
+    for (;;)
+    {
+    }
+}
+
 void sys_set_priority_grouping(u32 priority)
 {
     volatile u32 reg = SCB->AIRCR;

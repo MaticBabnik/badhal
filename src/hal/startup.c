@@ -2,6 +2,7 @@
 #include "./intrin.h"
 
 #pragma GCC push_options
+// If this gets optimized, we hang on startup
 #pragma GCC optimize ("O0")
 
 extern u32 _sidata; // Start of initialization values for .data
@@ -10,14 +11,14 @@ extern u32 _edata;  // End of .data section in SRAM
 extern u32 _sbss;   // Start of .bss section
 extern u32 _ebss;   // End of .bss section
 extern u32 _estack; // Stack top
-extern void entry() __attribute__((noinline));
+INLINE_NEVER extern void entry();
 
 #define INTPROTO(__name__) void __name__() __attribute__((weak,noinline,alias("Default_Handler")));
 
 void Reset_Handler()
 {
     asm volatile("ldr sp, =_estack");
-    u32 *src, *dst;
+    volatile u32 *src, *dst;
 
     src = &_sidata;
     for (dst = &_sdata; dst < &_edata;)
