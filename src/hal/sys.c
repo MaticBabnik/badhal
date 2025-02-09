@@ -24,7 +24,7 @@ void sys_nvic_set_priority(i32 irq_n, u32 prio)
 }
 
 // im gonna cry
-//TODO use the gpio_init_alt_mask() function
+// TODO use the gpio_init_alt_mask() function
 void sys_init_ext_mem()
 {
     volatile u32 tmp;
@@ -170,9 +170,10 @@ void sys_init_ext_mem()
     (void)(tmp);
 }
 
-u32 coreFreq = 64000000; //Hz
+u32 coreFreq = 64000000; // Hz
 
-u32 sys_get_freq() {
+u32 sys_get_freq()
+{
     return coreFreq;
 }
 
@@ -235,10 +236,13 @@ void sys_earlyinit()
     FMC_Bank1_R->BTCR[0] = 0x000030D2;
 }
 
+extern void onTick();
+
 volatile u32 tick = 0;
 void SysTick_Handler()
 {
     tick++;
+    onTick();
 }
 
 u32 sys_get_tick()

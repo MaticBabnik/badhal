@@ -19,9 +19,11 @@
 #include "hw/ltdc.h"
 #include "hw/dma2d.h"
 #include "hw/debug.h"
+#include "hw/usart.h"
 
 #define PERIPHERAL_DEF(_type_, _name_, _address_) static struct _type_ *const _name_ = (void *)_address_
 
+PERIPHERAL_DEF(USART_t, USART3, 0x40004800);
 PERIPHERAL_DEF(LTDC_t, LTDC, 0x50001000);
 PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer1, 0x50001084);
 PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer2, 0x50001104);
@@ -59,7 +61,7 @@ PERIPHERAL_DEF(TPI_t, TPI, 0xE0040000);
 void sys_earlyinit();
 void sys_lateinit();
 u32 sys_get_tick();
-void sys_delay_ms();
+void sys_delay_ms(u32 time);
 void sys_go_fast();
 u32 sys_get_freq();
 
