@@ -1,14 +1,15 @@
 #include "badhal.h"
+#include "driver/clock.h"
 
-INLINE_NEVER void sys_trap(volatile char *msg)
-{
-    for (;;)
-    {
+// TODO: a lot of this should be in driver/ and the rest is bsp/
+
+INLINE_NEVER void sys_trap(volatile char *msg) {
+    for (;;) {
+        a_nop();
     }
 }
 
-void sys_set_priority_grouping(u32 priority)
-{
+void sys_set_priority_grouping(u32 priority) {
     volatile u32 reg = SCB->AIRCR;
 
     reg &= ~(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk); // clear bits
@@ -18,24 +19,19 @@ void sys_set_priority_grouping(u32 priority)
     SCB->AIRCR = reg; // write back
 }
 
-void sys_nvic_set_priority(i32 irq_n, u32 prio)
-{
-    if (irq_n > 0)
-    {
+void sys_nvic_set_priority(i32 irq_n, u32 prio) {
+    if (irq_n > 0) {
         NVIC->IP[irq_n] = (prio << 5) & 0xFF;
-    }
-    else
-    {
+    } else {
         SCB->SHPR[((irq_n) & 0xF) - 4] = (prio << 5) & 0xFF;
     }
 }
 
 // im gonna cry
 // TODO use the gpio_init_alt_mask() function
-void sys_init_ext_mem()
-{
+void sys_init_ext_mem() {
     volatile u32 tmp;
-    register u32 tmpreg, timeout = 0xFFFF;
+    register u32 tmpreg = 0xff, timeout = 0xFFFF;
     register volatile u32 index;
 
     // Enable GPIO D-I interface clock
@@ -102,7 +98,8 @@ void sys_init_ext_mem()
     /* Configure PHx pins in Pull-up */
     GPIOH->PUPDR = 0x55555400;
 
-    /*-- FMC Configuration ------------------------------------------------------*/
+    /*-- FMC Configuration
+     * ------------------------------------------------------*/
     /* Enable the FMC interface clock */
     RCC->AHB3ENR |= (RCC_AHB3ENR_FMCEN);
     /*SDRAM Timing and access interface configuration*/
@@ -133,8 +130,7 @@ void sys_init_ext_mem()
     /* Clock enable command */
     FMC_Bank5_6_R->SDCMR = 0x00000009;
     tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
-    while ((tmpreg != 0) && (timeout-- > 0))
-    {
+    while ((tmpreg != 0) && (timeout-- > 0)) {
         tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
     }
 
@@ -145,22 +141,22 @@ void sys_init_ext_mem()
     /* PALL command */
     FMC_Bank5_6_R->SDCMR = 0x0000000A;
     timeout = 0xFFFF;
-    while ((tmpreg != 0) && (timeout-- > 0))
-    {
+    tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
+    while ((tmpreg != 0) && (timeout-- > 0)) {
         tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
     }
 
     FMC_Bank5_6_R->SDCMR = 0x000000EB;
     timeout = 0xFFFF;
-    while ((tmpreg != 0) && (timeout-- > 0))
-    {
+    tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
+    while ((tmpreg != 0) && (timeout-- > 0)) {
         tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
     }
 
     FMC_Bank5_6_R->SDCMR = 0x0004400C;
     timeout = 0xFFFF;
-    while ((tmpreg != 0) && (timeout-- > 0))
-    {
+    tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
+    while ((tmpreg != 0) && (timeout-- > 0)) {
         tmpreg = FMC_Bank5_6_R->SDSR & 0x00000020;
     }
     /* Set refresh count */
@@ -174,39 +170,45 @@ void sys_init_ext_mem()
     /*FMC controller Enable*/
     FMC_Bank1_R->BTCR[0] |= 0x80000000;
 
-    (void)(tmp);
+    (void) (tmp);
 }
 
 u32 coreFreq = 64000000; // Hz
 
-u32 sys_get_freq()
-{
+u32 sys_get_freq() {
     return coreFreq;
 }
 
-void sys_set_systick(u32 tick)
-{
+void sys_set_systick(u32 tick) {
     // update systick
     SysTick->LOAD = tick - 1;
     sys_nvic_set_priority(-1, 7);
     SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE | SysTick_CTRL_TICKINT | SysTick_CTRL_ENABLE;
+    SysTick->CTRL =
+        SysTick_CTRL_CLKSOURCE | SysTick_CTRL_TICKINT | SysTick_CTRL_ENABLE;
 }
 
-void sys_earlyinit()
-{
+void sys_earlyinit() {
     // volatile u32 tmp;
 
     // default flash latency
     FLASH->ACR = (FLASH->ACR & ~(0xful)) | 7;
 
-    // this should enable FPU access?
-    SCB->CPACR &= ~(SCB_CPARCR_FULL_ACCESS_EVERYTHING);
+    // Enable FPU in all modes
+    SCB->CPACR |= 0xfffffffful;
+
+    a_dsb();
+    a_isb();
+
+    if (SCB->CPACR == 0) {
+        sys_trap("FPU died???");
+    }
 
     // reset a bunch of clock related shit
     RCC->CR |= RCC_CR_HSION;
     RCC->CFGR = 0;
-    /* Reset HSEON, CSSON , CSION,RC48ON, CSIKERON PLL1ON, PLL2ON and PLL3ON bits */
+    /* Reset HSEON, CSSON , CSION,RC48ON, CSIKERON PLL1ON, PLL2ON and PLL3ON
+     * bits */
     RCC->CR &= 0xEAF6ED7FU;
     RCC->D1CFGR = 0x00000000;
     RCC->D2CFGR = 0x00000000;
@@ -223,60 +225,60 @@ void sys_earlyinit()
     RCC->CIER = 0x00000000;
 
     // D2 SRAM????
-    // RCC->AHB2ENR |= (RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN | RCC_AHB2ENR_SRAM3EN);
-    // tmp = RCC->AHB2ENR;
+    // RCC->AHB2ENR |= (RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN |
+    // RCC_AHB2ENR_SRAM3EN); tmp = RCC->AHB2ENR;
     //(void)tmp;
 
     // unhinged shit: if stm32h7 revY
-    if (((*((u32 *)0x5C001000ul)) & 0xFFFF0000U) < 0x20000000U)
-    {
+    // TODO: I'm pretty sure all these registers are in hwdef
+    if (((*((u32 *) 0x5C001000ul)) & 0xFFFF0000U) < 0x20000000U) {
         // Change the switch matrix read issuing capability to 1
         // for the AXI SRAM target (Target 7) (i have no clue what this means)
-        *((volatile u32 *)0x51008108) = 0x000000001U;
+        *((volatile u32 *) 0x51008108) = 0x000000001U;
     }
 
     RCC->APB4ENR |= 2; // SYSCFG enable ???
 
     // Disable the FMC bank1 (enabled after reset).
-    // This, prevents CPU speculation access on this bank which blocks the use of FMC during
-    // 24us. During this time the others FMC master (such as LTDC) cannot use it!
+    // This, prevents CPU speculation access on this bank which blocks the use
+    // of FMC during 24us. During this time the others FMC master (such as LTDC)
+    // cannot use it!
     FMC_Bank1_R->BTCR[0] = 0x000030D2;
 }
+
+/*
+    The following code is some of the worst around
+    - random extern function that just needs to exist
+    - ISR in the middle of a C file that gets baked in automatically
+*/
 
 extern void onTick();
 
 volatile u32 tick = 0;
-void SysTick_Handler()
-{
+void SysTick_Handler() {
     tick++;
     onTick();
 }
 
-u32 sys_get_tick()
-{
+u32 sys_get_tick() {
     return tick;
 }
 
-void sys_delay_ms(u32 time)
-{
+void sys_delay_ms(u32 time) {
     u32 start = tick;
 
-    if (time < 0xffffffff)
-        time++;
+    if (time < 0xffffffff) time++;
 
-    while ((tick - start) < time)
-    {
+    while ((tick - start) < time) {
     }
 }
 
 // Enable LDO
-void sys_power_ldo()
-{
+void sys_power_ldo() {
     volatile u32 tmp;
     PWR->CR3 = (PWR->CR3 & ~(PWR_SUPPLY_CONFIG_MASK)) | PWR_SUPPLY_LDO;
     tmp = PWR->CR3;
-    while (!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY))
-    {
+    while (!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY)) {
         // wait for voltage level
     }
     // ~~disable~~ enable overdrive
@@ -287,32 +289,28 @@ void sys_power_ldo()
     PWR->D3CR |= 0xc000;
     tmp = PWR->D3CR;
 
-    while ((PWR->D3CR & (1u << 13)) == 0)
-    {
+    while ((PWR->D3CR & (1u << 13)) == 0) {
         // wait for VOSRDY
     }
 
-    (void)tmp;
+    (void) tmp;
 }
 
-void sys_init_oscilator()
-{
+void sys_init_oscilator() {
     // all the oscilators
     RCC->CR |= RCC_CR_HSEON | RCC_CR_HSI48ON | RCC_CR_HSION;
     RCC->CSR |= RCC_CSR_LSION;
 
     // wait for them
-    while (!(
-        (RCC->CR & (RCC_CR_HSERDY | RCC_CR_HSI48ON | RCC_CR_HSION)) |
-        (RCC->CSR & RCC_CSR_LSIRDY)))
-    {
+    while (
+        !((RCC->CR & (RCC_CR_HSERDY | RCC_CR_HSI48ON | RCC_CR_HSION))
+          | (RCC->CSR & RCC_CSR_LSIRDY))) {
     }
 
     // disable PLL1
     RCC->CR &= ~RCC_CR_PLL1ON;
     // wait for PLL1 to unlock
-    while (RCC->CR & RCC_CR_PLL1RDY)
-    {
+    while (RCC->CR & RCC_CR_PLL1RDY) {
     }
 
     // --- Init PLL1 ---
@@ -320,25 +318,25 @@ void sys_init_oscilator()
     RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLSOURCE_Mask) | RCC_PLLSOURCE_HSE;
 
     // pre-divide by 5
-    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLSOURCE_DIVM1_Mask) |
-                     (5 << RCC_PLLSOURCE_DIVM1_Pos);
+    RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLSOURCE_DIVM1_Mask)
+                     | (5 << RCC_PLLSOURCE_DIVM1_Pos);
 
     // set VCIRANGE to 4-8MHz and VCORANGE to Wide (0)
-    RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL1RGE_Mask | RCC_PLLCFGR_PLL1VCOSEL_Mask)) |
-                   (0x2 << RCC_PLLCFGR_PLL1RGE_Pos);
+    RCC->PLLCFGR = (RCC->PLLCFGR
+                    & ~(RCC_PLLCFGR_PLL1RGE_Mask | RCC_PLLCFGR_PLL1VCOSEL_Mask))
+                   | (0x2 << RCC_PLLCFGR_PLL1RGE_Pos);
 
     // Disable fractional part
     RCC->PLLCFGR &= ~RCC_PLLCFGR_PLL1FRACEN;
 
     // Enable dividers
-    RCC->PLLCFGR |= RCC_PLLCFGR_DIVP1EN | RCC_PLLCFGR_DIVQ1EN |
-                    RCC_PLLCFGR_DIVR1EN;
+    RCC->PLLCFGR |=
+        RCC_PLLCFGR_DIVP1EN | RCC_PLLCFGR_DIVQ1EN | RCC_PLLCFGR_DIVR1EN;
 
     // Set dividers
-    RCC->PLL1DIVR = (1 << RCC_PLL1DIVR_DIVR_Pos) |
-                    (3 << RCC_PLL1DIVR_DIVQ_Pos) |
-                    (1 << RCC_PLL1DIVR_DIVP_Pos) |
-                    (159 << RCC_PLL1DIVR_DIVN_Pos);
+    RCC->PLL1DIVR = (1 << RCC_PLLxDIVR_DIVR_Pos) | (3 << RCC_PLLxDIVR_DIVQ_Pos)
+                    | (1 << RCC_PLLxDIVR_DIVP_Pos)
+                    | (159 << RCC_PLLxDIVR_DIVN_Pos);
 
     // sej ni vazn ~~set FRACN1 to 0~~
     // RCC->PLL1FRACR = 0;
@@ -347,35 +345,69 @@ void sys_init_oscilator()
     RCC->CR |= RCC_CR_PLL1ON;
 
     // wait for PLL1
-    while (!(RCC->CR & RCC_CR_PLL1RDY))
-    {
+    while (!(RCC->CR & RCC_CR_PLL1RDY)) {
     }
 }
 
-void sys_clk_config()
-{
+void sys_init_osc2() {
+    // enable HSE, HSI48 and HSI
+    RCC->CR |= RCC_CR_HSEON | RCC_CR_HSI48ON | RCC_CR_HSION;
+    clk_wait_ready(RCC_CR_HSERDY | RCC_CR_HSI48RDY | RCC_CR_HSIRDY);
+
+    clk_pll_disable_all();
+
+    clk_pll_srccfg(
+        CK_PLL_SRC_HSE, // 25 MHz
+        5,              // PLL1 DIVM -> 5MHz
+        32,             // PLL2 DIVM -> 0.78125MHz for no reason
+        2               // PLL3 DIVM -> 12.5MHz    for no reason
+    );
+
+    clk_pll_cfg(
+        PLL1, P_NO_FRAC, P_MEDIUM_VCO,
+        PLL_Range_4_8MHz, // We get 5MHz in
+        PLL_Div_All
+    );
+
+    clk_pll_divcfg(
+        PLL1,
+        192, // 960MHz internal
+        2,   // P: 480MHz - max CPU clock
+        8,   // Q: 120MHz
+        4    // R: 240MHz - max peripheral clock
+    );
+
+    clk_pll_enable_one(PLL1);
+    clk_wait_ready(RCC_CR_PLL1RDY);
+}
+
+void sys_clk_config() {
     // 7 waits states, 2 for the other thing, idk
     FLASH->ACR = (FLASH->ACR & ~(0xfful)) | 0x27;
 
     RCC->D1CFGR = (RCC->D1CFGR & ~(0xful)) | (0x8ul); // HCPRE div by 2
-    // mess around with domain clocks... i think this is relavant for peripherals
-    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
-    RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_D1CPRE_Mask) | RCC_D1CFGR_D1CPRE_DIV1;
-    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
-    RCC->D2CFGR = (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE2_Mask) | RCC_DxCFGR_DxPPRE2_DIV2;
-    RCC->D3CFGR = (RCC->D3CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    // mess around with domain clocks... i think this is relavant for
+    // peripherals
+    RCC->D1CFGR =
+        (RCC->D1CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    RCC->D1CFGR =
+        (RCC->D1CFGR & ~RCC_D1CFGR_D1CPRE_Mask) | RCC_D1CFGR_D1CPRE_DIV1;
+    RCC->D2CFGR =
+        (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
+    RCC->D2CFGR =
+        (RCC->D2CFGR & ~RCC_DxCFGR_DxPPRE2_Mask) | RCC_DxCFGR_DxPPRE2_DIV2;
+    RCC->D3CFGR =
+        (RCC->D3CFGR & ~RCC_DxCFGR_DxPPRE1_Mask) | RCC_DxCFGR_DxPPRE1_DIV2;
 
     // Switch system clock source (or die trying)
     RCC->CFGR |= RCC_CFGR_SW_PLL1;
-    while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1)
-    {
+    while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1) {
     }
 
     // Set FLASH latencty
 }
 
-void sys_go_fast()
-{
+void sys_go_fast() {
     volatile u32 tmp;
     sys_power_ldo();
     sys_init_oscilator();
@@ -395,13 +427,20 @@ void sys_go_fast()
     // Enables the I/O Compensation Cell
     SYSCFG->CCCSR |= SYSCFG_CCCSR_EN;
 
-    (void)tmp;
+    (void) tmp;
 }
 
-void sys_lateinit()
-{
+void sys_lateinit() {
     // NVIC Group
     sys_set_priority_grouping(3); // what the sigma?
 
     sys_set_systick(64000);
+}
+
+void sys_allfaults() {
+    SCB->SHCSR |=
+        SCB_SHCSR_BUSFAULTENA
+        | SCB_SHCSR_USGFAULTENA; // SCB_SHCSR_MEMFAULTENA (handled in mpu fns)
+    SCB->CCR |=
+        SCB_CCR_DIV_0_TRP; // | SCB_CCR_UNALIGN_TRP; (randomly dies in crash)
 }

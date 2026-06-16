@@ -10,7 +10,7 @@
 
             "servertype": "openocd",
             "runToEntryPoint": "entry",
-            "executable": "./build/starter",
+            "executable": "./build/badhal",
             
             "device": "STM32H750X",
             "svdFile": "${workspaceFolder}/STM32H750X.svd",
@@ -24,8 +24,8 @@
             "swoConfig": {
                 "enabled": true,
                 "source": "probe",
-                "swoFrequency": 2000,
-                "cpuFrequency": 400000,
+                "swoFrequency": 2000000,
+                "cpuFrequency": 400000000,
                 "decoders": [
                     {
                         "type": "console",

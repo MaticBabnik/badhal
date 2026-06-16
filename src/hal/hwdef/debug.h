@@ -1,16 +1,14 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct CoreDebug_t
-{
+struct CoreDebug_t {
     R_RW u32 DHCSR;
     R_WO u32 DCRSR;
     R_RW u32 DCRDR;
     R_RW u32 DEMCR;
 };
 
-struct DBGMCU_t
-{
+struct DBGMCU_t {
     R_RW u32 IDCODE;
     R_RW u32 CR;
     u32 __reserved4[11];
@@ -25,8 +23,7 @@ struct DBGMCU_t
     R_RW u32 APB4FZ1;
 };
 
-struct TPI_t
-{
+struct TPI_t {
     R_RO u32 SSPSR;
     R_RW u32 CSPSR;
     u32 __reserved0[2U];
@@ -53,10 +50,8 @@ struct TPI_t
     R_RO u32 DEVTYPE;
 };
 
-struct ITM_t
-{
-    R_WO union
-    {
+struct ITM_t {
+    R_WO union {
         R_WO u8 u8;
         R_WO u16 u16;
         R_WO u32 u32;

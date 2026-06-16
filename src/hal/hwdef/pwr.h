@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../bad.h"
+#include "../core/bad.h"
 
-
-struct PWR_t
-{
+struct PWR_t {
     R_RW u32 CR1;
     R_RW u32 CSR1;
     R_RW u32 CR2;
@@ -17,7 +15,6 @@ struct PWR_t
     R_RW u32 WKUPFR;
     R_RW u32 WKUPEPR;
 };
-
 
 #define PWR_SUPPLY_CONFIG_MASK 0x7UL
 #define PWR_SUPPLY_LDO 0x2

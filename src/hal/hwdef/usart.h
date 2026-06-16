@@ -1,8 +1,7 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct USART_t
-{
+struct USART_t {
     R_RW u32 CR1;
     R_RW u32 CR2;
     R_RW u32 CR3;
@@ -19,3 +18,10 @@ struct USART_t
 
 #define USART_ISR_RXNE (1ul << 5ul)
 #define USART_ISR_TXE (1ul << 7ul)
+
+#define USART_CR1_UE (1UL << 0)
+#define USART_CR1_RE (1UL << 2)
+#define USART_CR1_TE (1UL << 3)
+
+#define USART_ISR_REACK (1UL << 22)
+#define USART_ISR_TEACK (1UL << 21)

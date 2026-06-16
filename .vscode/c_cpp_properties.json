@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "ARM32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "cStandard": "c23",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc"
+        }
+    ],
+    "version": 4
+}

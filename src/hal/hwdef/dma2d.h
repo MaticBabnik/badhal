@@ -1,8 +1,7 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct DMA2D_t
-{
+struct DMA2D_t {
     R_RW u32 CR;
     R_RW u32 ISR;
     R_RW u32 IFCR;

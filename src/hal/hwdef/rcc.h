@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct RCC_t
-{
+struct RCC_t {
     R_RW u32 CR;
     R_RW u32 HSISCR;
     R_RW u32 CRRCR;
@@ -106,6 +105,10 @@ struct RCC_t
     u32 __reservedB[31];
 };
 
+#define RCC_D3CCIPR_ADCSEL_Msk ((0x3ul) << 16ul)
+#define RCC_D3CCIPR_ADCSEL_per_ck ((0x2ul) << 16ul)
+#define RCC_AHB1ENR_ADC12EN (1ul << 5ul)
+
 #define RCC_APB1LENR_USART3EN (1UL << 18)
 
 #define RCC_AHB2ENR_SRAM1EN (1UL << 29)
@@ -115,7 +118,7 @@ struct RCC_t
 #define RCC_APB3ENR_LTDCEN (1UL << 3)
 
 #define RCC_AHB3ENR_FMCEN (1UL << 12)
-#define RCC_APB4ENR_SYSCFGEN (1UL < 1)
+#define RCC_APB4ENR_SYSCFGEN (1UL << 1)
 
 #define RCC_AHB4ENR_GPIOAEN (1UL << 0)
 #define RCC_AHB4ENR_GPIOBEN (1UL << 1)
@@ -152,14 +155,19 @@ struct RCC_t
 #define RCC_CR_CSION (1UL << 7)
 #define RCC_CR_HSEON (1UL << 16)
 #define RCC_CR_PLL1ON (1UL << 24)
+#define RCC_CR_PLL2ON (1UL << 26)
+#define RCC_CR_PLL3ON (1UL << 28)
 #define RCC_CR_HSI48ON (1UL << 12)
 #define RCC_CSR_LSION 1UL
 
-// RCC_CR_CSION
 #define RCC_CR_HSIRDY (1UL << 2)
 #define RCC_CR_CSIRDY (1UL << 8)
 #define RCC_CR_HSERDY (1UL << 17)
+
 #define RCC_CR_PLL1RDY (1UL << 25)
+#define RCC_CR_PLL2RDY (1UL << 27)
+#define RCC_CR_PLL3RDY (1UL << 29)
+
 #define RCC_CR_HSI48RDY (1UL << 13)
 #define RCC_CSR_LSIRDY (1UL << 1)
 
@@ -167,12 +175,22 @@ struct RCC_t
 #define RCC_PLLSOURCE_Mask (0x3UL)
 
 #define RCC_PLLSOURCE_DIVM1_Pos 4UL
+#define RCC_PLLSOURCE_DIVM2_Pos 12UL
+#define RCC_PLLSOURCE_DIVM3_Pos 20UL
 #define RCC_PLLSOURCE_DIVM1_Mask (0x3FUL << 4)
+#define RCC_PLLSOURCE_DIVM2_Mask (0x3FUL << 12)
+#define RCC_PLLSOURCE_DIVM3_Mask (0x3FUL << 20)
 
-#define RCC_PLL1DIVR_DIVR_Pos 24UL
-#define RCC_PLL1DIVR_DIVQ_Pos 16UL
-#define RCC_PLL1DIVR_DIVP_Pos 9UL
-#define RCC_PLL1DIVR_DIVN_Pos 0UL
+#define RCC_PLLxDIVR_DIVR_Pos 24UL
+#define RCC_PLLxDIVR_DIVQ_Pos 16UL
+#define RCC_PLLxDIVR_DIVP_Pos 9UL
+#define RCC_PLLxDIVR_DIVN_Pos 0UL
+
+// these masks are unshifted
+#define RCC_PLLxDIVR_DIVR_UMask (0x7FUL)
+#define RCC_PLLxDIVR_DIVQ_UMask (0x7FUL)
+#define RCC_PLLxDIVR_DIVP_UMask (0x7FUL)
+#define RCC_PLLxDIVR_DIVN_UMask (0x1FFUL)
 
 #define RCC_PLLCFGR_PLL1FRACEN (1UL)
 #define RCC_PLLCFGR_DIVP1EN (1UL << 16)
@@ -186,6 +204,8 @@ struct RCC_t
 #define RCC_PLL1FRACR_FRACN1_Pos 3UL
 #define RCC_PLL1FRACR_FRACN1_Mask (0xfffUL << 3)
 
-#define RCC_D2CCIP2R_USART234578SEL_Mask 0x7fUL
+#define RCC_D2CCIP2R_USART234578SEL_Mask 0x7UL
 #define RCC_D2CCIP2R_USART234578SEL_Pos 0UL
 #define RCC_D2CCOP2R_USART234578SEL_HSI 0x3UL
+
+#define RCC_APB1LRSTR_USART3RST (1UL << 18)

@@ -1,3 +1,7 @@
+/*
+    USART driver
+*/
+
 #pragma once
 #include "../badhal.h"
 

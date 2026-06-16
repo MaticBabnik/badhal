@@ -1,8 +1,7 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct LTDC_t
-{
+struct LTDC_t {
     u32 reserved0[2];
     R_RW u32 SSCR;
     R_RW u32 BPCR;
@@ -22,8 +21,7 @@ struct LTDC_t
     R_RW u32 CDSR;
 };
 
-struct LTDC_Layer_t
-{
+struct LTDC_Layer_t {
     R_RW u32 CR;
     R_RW u32 WHPCR;
     R_RW u32 WVPCR;
@@ -39,5 +37,3 @@ struct LTDC_Layer_t
     u32 reserved1[3];
     R_RW u32 CLUTWR;
 };
-
-void ltdc_init();

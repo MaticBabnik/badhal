@@ -1,3 +1,8 @@
+/*
+    Debug output via SWO
+*/
+
+#pragma once
 #include "../badhal.h"
 
 void swo_init(u32 swo_freq);

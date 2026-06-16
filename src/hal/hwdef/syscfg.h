@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../bad.h"
+#include "../core/bad.h"
 
-
-struct SYSCFG_t
-{
+struct SYSCFG_t {
     u32 __reserved1;
     R_RW u32 PMCR;
     R_RW u32 EXTICR[4];

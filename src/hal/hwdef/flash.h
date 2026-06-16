@@ -1,8 +1,7 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct FLASH_t
-{
+struct FLASH_t {
     R_RW u32 ACR;
     R_RW u32 KEYR1;
     R_RW u32 OPTKEYR;

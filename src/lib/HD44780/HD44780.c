@@ -1,7 +1,6 @@
 #include "HD44780.h"
 
-void hd44780_put4(u8 v)
-{
+void hd44780_put4(u8 v) {
     gpio_put(HD_D0, v & 1);
     gpio_put(HD_D1, v & 2);
     gpio_put(HD_D2, v & 4);
@@ -17,21 +16,18 @@ void hd44780_put4(u8 v)
     sys_delay_ms(1);
 }
 
-void hd44780_send(u8 v, u8 mode)
-{
+void hd44780_send(u8 v, u8 mode) {
     gpio_put(HD_RS, mode);
 
     hd44780_put4(v >> 4);
     hd44780_put4(v);
 }
 
-void hd44780_command(u8 v)
-{
+void hd44780_command(u8 v) {
     hd44780_send(v, 0);
 }
 
-void hd44780_write(u8 v)
-{
+void hd44780_write(u8 v) {
     hd44780_send(v, 1);
 }
 
@@ -47,8 +43,7 @@ void hd44790_puts(const char *str) {
     }
 }
 
-void hd44780_init()
-{
+void hd44780_init() {
     gpio_init_output(HD_D0, HD_OUTPUT);
     gpio_init_output(HD_D1, HD_OUTPUT);
     gpio_init_output(HD_D2, HD_OUTPUT);
@@ -64,8 +59,7 @@ void hd44780_init()
     gpio_put(HD_EN, 0);
     gpio_put(HD_BC, 1);
 
-    for (u32 i = 0; i < 3; i++)
-    {
+    for (u32 i = 0; i < 3; i++) {
         hd44780_put4(3);
         sys_delay_ms(5);
     }

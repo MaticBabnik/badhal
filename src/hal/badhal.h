@@ -2,10 +2,11 @@
 /*
    badhal.h - Shitty HAL za STM32H750
 */
-#pragma once
-#include "bad.h"
-#include "intrin.h"
 
+#pragma once
+#include "core/bad.h"
+
+#include "hwdef/adc.h"
 #include "hwdef/flash.h"
 #include "hwdef/fmc.h"
 #include "hwdef/gpio.h"
@@ -21,9 +22,11 @@
 #include "hwdef/debug.h"
 #include "hwdef/usart.h"
 
-#define PERIPHERAL_DEF(_type_, _name_, _address_) static struct _type_ *const _name_ = (void *)_address_
+#define PERIPHERAL_DEF(_type_, _name_, _address_)                              \
+    static struct _type_ *const _name_ = (void *) _address_
 
 PERIPHERAL_DEF(USART_t, USART3, 0x40004800);
+PERIPHERAL_DEF(ADC_t, ADC1, 0x40022000);
 PERIPHERAL_DEF(LTDC_t, LTDC, 0x50001000);
 PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer1, 0x50001084);
 PERIPHERAL_DEF(LTDC_Layer_t, LTDC_Layer2, 0x50001104);
@@ -58,12 +61,21 @@ PERIPHERAL_DEF(TPI_t, TPI, 0xE0040000);
 
 #define SDRAM_BASE 0xD0000000
 
+typedef enum {
+    CT_None = 0b00,
+    CT_WriteBack_RWAlloc = 0b01,
+    CT_WriteThrough_RAlloc = 0b10,
+    CT_WriteBack_RAlloc = 0b11
+} CacheType_t;
+
 void sys_earlyinit();
 void sys_lateinit();
 u32 sys_get_tick();
 void sys_delay_ms(u32 time);
 void sys_go_fast();
 u32 sys_get_freq();
+void sys_allfaults();
+void sys_init_ext_mem();
 
 void sys_icache_enable();
 void sys_dcache_enable();
@@ -71,5 +83,5 @@ void sys_dcache_flush();
 void sys_dcache_invalidate();
 void sys_dcache_disable();
 
-void mem_mpu_setup_sdram();
+void mem_mpu_setup_sdram(CacheType_t c);
 void sys_trap(volatile char *msg);

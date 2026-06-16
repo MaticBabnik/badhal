@@ -1,59 +1,112 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.24)
 
-# setup compiler before project()
-set(TOOL_PREFIX "arm-none-eabi-" CACHE STRING "point to $dir/arm-none-eabi- to if your compiler isnt in path")
-set(CMAKE_C_COMPILER "${TOOL_PREFIX}gcc")
-set(CMAKE_CXX_COMPILER "${TOOL_PREFIX}g++")
-set(CMAKE_LINKER "${TOOL_PREFIX}ld")
-set(OBJCOPY "${TOOL_PREFIX}objcopy")
-set(OBJDUMP "${TOOL_PREFIX}objdump")
-set(SIZE "${TOOL_PREFIX}size")
-
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(GCC_PREFIX "arm-none-eabi-" CACHE STRING "Path and prefix for GCC and binutils")
+set(CLANG_PATH "" CACHE STRING "Path for Clang and llvm tools")
 
-project(MyProject C CXX ASM)
+# this one is for AUR "baremetal-compiler-rt" as of now (see commit date :) )
+set(CLANG_RTLIB_PATH 
+    "/usr/lib/clang/22/lib/baremetal/libclang_rt.builtins-armv7em.a" 
+    CACHE STRING
+    "Path to libclang_rt.builtins-armv7em.a"
+)
 
-file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" )
+option(USE_CLANG "Build with clang instead of gcc" OFF)
 
-# Replace .s extension with .o for object files
-foreach(source ${srcs})
-    string(REGEX REPLACE "\\.[sS]$" ".o" obj ${source})
-    list(APPEND OBJS ${obj})
-    endforeach()
+if (USE_CLANG)
+    set(CMAKE_C_COMPILER "${CLANG_PATH}clang")
+    set(CMAKE_LINKER "${CLANG_PATH}clang")
+    set(OBJCOPY "${CLANG_PATH}llvm-objcopy")
+    set(OBJDUMP "${CLANG_PATH}llvm-objdump")
+    set(SIZE "${CLANG_PATH}llvm-size")
+else()
+    set(CMAKE_C_COMPILER "${GCC_PREFIX}gcc")
+    set(CMAKE_LINKER "${GCC_PREFIX}ld")
+    set(OBJCOPY "${GCC_PREFIX}objcopy")
+    set(OBJDUMP "${GCC_PREFIX}objdump")
+    set(SIZE "${GCC_PREFIX}size")
+endif()
+
+project(BadHAL C ASM)
 
 include_directories(${CMAKE_SOURCE_DIR})
-
+file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" )
 
 set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m7 -mthumb -g3 -O0 -flto -gdwarf -ffreestanding -fno-builtin -nostdlib -fno-common -Wall -pedantic -Wsign-compare -Wcast-align -Wconversion -fsingle-precision-constant -ffunction-sections -fdata-sections")
+set(CPU_FLAGS 
+    -mthumb 
+    -mcpu=cortex-m7
+    -mfpu=fpv5-d16 
+    -mfloat-abi=hard
+    -march=armv7e-m+fp.dp
+    -mtune=cortex-m7
+)
 
-# Shouldn't affect projects that don't use FP at all
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=hard -mfpu=fpv5-d16") 
+set(OPT_FLAGS
+    -g3
+    -O3
+    -flto
+    -gdwarf
+)
+
+set(BADHAL_FLAGS
+    -ffreestanding
+    -fno-builtin
+    -nostdlib
+    -fno-common
+    -ffunction-sections
+    -fdata-sections    
+)
+
+set(BADHAL_LINKER_FLAGS
+    -nostdlib
+    -nostartfiles
+    -Wl,--gc-sections
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/Main.map
+)
+
+if (USE_CLANG)
+    list(PREPEND CPU_FLAGS --target=armv7em-none-eabi)
+    list(APPEND BADHAL_FLAGS -Wdouble-promotion)
+    list(APPEND BADHAL_LINKER_FLAGS -fuse-ld=lld "${CLANG_RTLIB_PATH}")
+else()
+    list(APPEND BADHAL_FLAGS -fsingle-precision-constant)
+    list(APPEND BADHAL_LINKER_FLAGS --specs=nosys.specs)
+endif()
+
+string(REPLACE ";" " " C_FLAGS_STR "${CPU_FLAGS} ${OPT_FLAGS} ${BADHAL_FLAGS}")
+string(REPLACE ";" " " L_FLAGS_STR "${CPU_FLAGS} ${OPT_FLAGS} ${BADHAL_LINKER_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_STR}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${L_FLAGS_STR}")
+
+
+message(STATUS "Using compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "Using linker: ${CMAKE_LINKER}")
+message(STATUS "Flags\nC: ${CMAKE_C_FLAGS}\nLinker: ${CMAKE_EXE_LINKER_FLAGS}")
 
 # Linker
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/linker/STM32H750XBHX_${LINK_MODE}.ld)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mcpu=cortex-m7 -march=armv7e-m -nostartfiles --specs=nosys.specs -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/Main.map")
 
-add_executable(starter ${srcs})
+add_executable(badhal ${srcs})
 
-
-set_target_properties(starter PROPERTIES LINK_FLAGS "-T${LINKER_SCRIPT}")
+set_target_properties(badhal PROPERTIES LINK_FLAGS "-T${LINKER_SCRIPT}")
 
 add_custom_target(size
-    COMMAND ${SIZE} ${CMAKE_CURRENT_BINARY_DIR}/starter
-    DEPENDS starter
+    COMMAND ${SIZE} ${CMAKE_CURRENT_BINARY_DIR}/badhal
+    DEPENDS badhal
 )
 
 add_custom_target(binary
-    COMMAND ${OBJCOPY} -O binary ${CMAKE_CURRENT_BINARY_DIR}/starter ${CMAKE_CURRENT_BINARY_DIR}/starter.bin
-    DEPENDS starter
+    COMMAND ${OBJCOPY} -O binary ${CMAKE_CURRENT_BINARY_DIR}/badhal ${CMAKE_CURRENT_BINARY_DIR}/badhal.bin
+    DEPENDS badhal
 )
 
 add_custom_target(burn
-    COMMAND st-flash write ${CMAKE_CURRENT_BINARY_DIR}/starter.bin 0x8000000
+    COMMAND st-flash write ${CMAKE_CURRENT_BINARY_DIR}/badhal.bin 0x8000000
     DEPENDS binary
 )

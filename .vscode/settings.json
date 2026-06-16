@@ -1,4 +1,13 @@
 {
     "cmake.configureOnOpen": false,
-    "cortex-debug.variableUseNaturalFormat": true
+    "cortex-debug.variableUseNaturalFormat": false,
+    "files.associations": {
+        ".clang-format": "yaml"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+    }
 }

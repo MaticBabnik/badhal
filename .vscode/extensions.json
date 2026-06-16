@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-vscode.cmake-tools",    // we use CMake
+        "ms-vscode.cpptools",       // C support
+        "marus25.cortex-debug",     // ARM debugging
+        "ms-vscode.hexeditor",      // Can't go wrong with a hex editor
+        "xaver.clang-format",       // C/C++ formatting
+    ]
+}

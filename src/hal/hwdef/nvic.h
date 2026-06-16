@@ -1,8 +1,7 @@
 #pragma once
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct NVIC_t
-{
+struct NVIC_t {
     R_RW u32 ISER[8U];
     u32 reserved0[24U];
     R_RW u32 ICER[8U];

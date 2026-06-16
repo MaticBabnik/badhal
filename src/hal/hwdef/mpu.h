@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../bad.h"
+#include "../core/bad.h"
 
-struct MPU_t
-{
+struct MPU_t {
     R_RO u32 TYPE;
     R_RW u32 CTRL;
     R_RW u32 RNR;
@@ -32,5 +31,10 @@ struct MPU_t
 
 #define MPU_RASR_ENABLE 1
 
-#define MPU_REGION_SIZE_32MB 0x18
 #define MPU_REGION_FULL_ACCESS 0x3
+
+// size in bytes = 2^(size+1)
+#define MPU_REGION_SIZE_8MB 0x16ul
+#define MPU_REGION_SIZE_16MB 0x17ul
+#define MPU_REGION_SIZE_32MB 0x18ul
+#define MPU_REGION_SIZE_64MB 0x19ul
