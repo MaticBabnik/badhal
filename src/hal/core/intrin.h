@@ -17,3 +17,6 @@ INLINE_ALWAYS void a_dsb() {
 INLINE_ALWAYS void a_nop() {
     asm volatile("nop");
 }
+INLINE_ALWAYS void a_wfi() {
+    asm volatile("wfi");
+}

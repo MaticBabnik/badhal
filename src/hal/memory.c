@@ -37,7 +37,7 @@ void mem_mpu_setup_sdram(CacheType_t c) {
                 | ((c & 0x3) << MPU_RASR_B_Pos)
                 | (MPU_REGION_FULL_ACCESS << MPU_RASR_AP_Pos);
 
-    mem_mpu_enable(MPU_PRIVILEGED_DEFAULT);
+    mem_mpu_enable(MPU_CTRL_PRIVDEFENA);
 
     if (dcache_was_enabled) {
         sys_dcache_enable();

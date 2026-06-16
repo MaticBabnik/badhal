@@ -67,7 +67,9 @@ struct SCB_t {
 #define SCB_SHCSR_USGFAULTENA (1UL << 18)
 
 #define SCB_CCR_DC (1UL << 16)
+#define SCB_CCR_DC_Pos 16
 #define SCB_CCR_IC (1UL << 17)
+#define SCB_CCR_IC_Pos 17
 #define SCB_CCR_BP (1UL << 18)
 #define SCB_CCR_STKALIGN (1UL << 9)
 #define SCB_CCR_DIV_0_TRP (1UL << 4)

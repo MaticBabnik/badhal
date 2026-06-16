@@ -1,9 +1,10 @@
 {
     "recommendations": [
-        "ms-vscode.cmake-tools",    // we use CMake
-        "ms-vscode.cpptools",       // C support
-        "marus25.cortex-debug",     // ARM debugging
-        "ms-vscode.hexeditor",      // Can't go wrong with a hex editor
-        "xaver.clang-format",       // C/C++ formatting
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "marus25.cortex-debug",
+        "ms-vscode.hexeditor",
+        "xaver.clang-format",
+        "ms-vscode.vscode-serial-monitor",
     ]
 }

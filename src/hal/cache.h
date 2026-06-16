@@ -72,3 +72,11 @@ INLINE_ALWAYS void sys_dcache_disable() {
 
     sys_dcache_flush();
 }
+
+INLINE_ALWAYS bool sys_dcache_enabled() {
+    return (SCB->CCR & SCB_CCR_DC) >> SCB_CCR_DC_Pos;
+}
+
+INLINE_ALWAYS bool sys_icache_enabled() {
+    return (SCB->CCR & SCB_CCR_IC) >> SCB_CCR_IC_Pos;
+}

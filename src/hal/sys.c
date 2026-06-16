@@ -296,8 +296,7 @@ void sys_power_ldo() {
     (void) tmp;
 }
 
-void sys_init_oscilator() {
-    // all the oscilators
+void sys_init_basic_oscilators() {
     RCC->CR |= RCC_CR_HSEON | RCC_CR_HSI48ON | RCC_CR_HSION;
     RCC->CSR |= RCC_CSR_LSION;
 
@@ -306,6 +305,11 @@ void sys_init_oscilator() {
         !((RCC->CR & (RCC_CR_HSERDY | RCC_CR_HSI48ON | RCC_CR_HSION))
           | (RCC->CSR & RCC_CSR_LSIRDY))) {
     }
+}
+
+void sys_init_oscilator() {
+    // all the oscilators
+    sys_init_basic_oscilators();
 
     // disable PLL1
     RCC->CR &= ~RCC_CR_PLL1ON;
@@ -360,14 +364,24 @@ void sys_init_osc2() {
         CK_PLL_SRC_HSE, // 25 MHz
         5,              // PLL1 DIVM -> 5MHz
         32,             // PLL2 DIVM -> 0.78125MHz for no reason
-        2               // PLL3 DIVM -> 12.5MHz    for no reason
+        5               // PLL3 DIVM -> 5MHz       LCD
     );
 
     clk_pll_cfg(
-        PLL1, P_NO_FRAC, P_MEDIUM_VCO,
-        PLL_Range_4_8MHz, // We get 5MHz in
-        PLL_Div_All
+        PLL1,
+        false, // no fraction
+        false, // wide VCO
+        PLL_Range_8_16MHz,
+        PLL_DivP | PLL_DivQ | PLL_DivR
     );
+    clk_pll_cfg(
+        PLL3,
+        false, // no fraction
+        false, // wide VCO
+        PLL_Range_8_16MHz,
+        PLL_DivR
+    );
+
 
     clk_pll_divcfg(
         PLL1,
@@ -377,8 +391,17 @@ void sys_init_osc2() {
         4    // R: 240MHz - max peripheral clock
     );
 
+    clk_pll_divcfg(
+        PLL3,
+        40,  // N: VCO = 5 * 40 = 200 MHz  (in range)
+        80,  // P: 2.5 MHz
+        20,  // Q: 10 MHz
+        20   // R: 10 MHz -> LCD
+    );
+
     clk_pll_enable_one(PLL1);
-    clk_wait_ready(RCC_CR_PLL1RDY);
+    clk_pll_enable_one(PLL3);
+    clk_wait_ready(RCC_CR_PLL1RDY | RCC_CR_PLL3RDY);
 }
 
 void sys_clk_config() {
@@ -403,18 +426,17 @@ void sys_clk_config() {
     RCC->CFGR |= RCC_CFGR_SW_PLL1;
     while ((RCC->CFGR & RCC_CFGR_SWS_Mask) != RCC_CFGR_SWS_PLL1) {
     }
-
-    // Set FLASH latencty
 }
 
 void sys_go_fast() {
     volatile u32 tmp;
     sys_power_ldo();
-    sys_init_oscilator();
+    // sys_init_oscilator();
+    sys_init_osc2();
     sys_clk_config();
 
-    sys_set_systick(400000); // trust me
-    coreFreq = 400000000;
+    sys_set_systick(480000); // trust me
+    coreFreq = 480000000;
 
     // activate CSI clock mondatory for I/O Compensation Cell
     RCC->CR |= RCC_CR_CSION;

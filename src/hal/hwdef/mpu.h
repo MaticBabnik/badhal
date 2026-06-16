@@ -16,8 +16,9 @@ struct MPU_t {
     R_RW u32 RASR_A3;
 };
 
-#define MPU_CTRL_ENABLE 1
-#define MPU_PRIVILEGED_DEFAULT 0x4
+#define MPU_CTRL_ENABLE (1ul << 0)
+#define MPU_CTRL_HFNMIENA (1ul << 1)
+#define MPU_CTRL_PRIVDEFENA (1ul << 2)
 
 #define MPU_RASR_ATTRS_Pos 16
 #define MPU_RASR_XN_Pos 28
