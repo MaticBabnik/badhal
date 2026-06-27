@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct SCB_t {
+typedef struct {
     R_RO u32 CPUID;
     R_RW u32 ICSR;
     R_RW u32 VTOR;
@@ -60,7 +60,7 @@ struct SCB_t {
     u32 reserved8[1U];
 
     R_RW u32 ABFSR;
-};
+} SCB_t;
 
 #define SCB_SHCSR_MEMFAULTENA (1UL << 16)
 #define SCB_SHCSR_BUSFAULTENA (1UL << 17)
@@ -80,6 +80,8 @@ struct SCB_t {
 
 #define SCB_AIRCR_PRIGROUP_Pos 8U
 #define SCB_AIRCR_PRIGROUP_Msk (7UL << SCB_AIRCR_PRIGROUP_Pos)
+
+#define SCB_AIRCR_SYSRESETREQ (1ul << 2)
 
 #define SCB_CPACR_CP_DENIED (0ul)
 #define SCB_CPACR_CP_PRIVILEGED (0x1ul)

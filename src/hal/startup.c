@@ -187,9 +187,7 @@ INTPROTO(WAKEUP_PIN_IRQHandler)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
-__attribute__((
-    section(".isr_vector"), used
-)) const isr_t g_pfnVectors[] = {
+__attribute__((section(".isr_vector"), used)) const isr_t g_pfnVectors[] = {
     (isr_t) &_estack,
     Reset_Handler,
     NMI_Handler,

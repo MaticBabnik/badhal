@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct MPU_t {
+typedef struct {
     R_RO u32 TYPE;
     R_RW u32 CTRL;
     R_RW u32 RNR;
@@ -14,7 +14,24 @@ struct MPU_t {
     R_RW u32 RASR_A2;
     R_RW u32 RBAR_A3;
     R_RW u32 RASR_A3;
-};
+} MPU_t;
+
+typedef enum {
+    CT_None = 0b00,
+    CT_WB_RWAlloc = 0b01,
+    CT_WT_RAlloc = 0b10,
+    CT_WB_RAlloc = 0b11
+} CacheType_t;
+
+typedef enum {
+    MAP_NoAccess = 0,
+    MAP_PrivOnly = 1,
+    MAP_UnprivRO = 2,
+    MAP_FullAccess = 3,
+    MAP_PrivRO = 5,
+    MAP_RO = 6,
+    MAP_RO2 = 7
+} MPUAccess_t;
 
 #define MPU_CTRL_ENABLE (1ul << 0)
 #define MPU_CTRL_HFNMIENA (1ul << 1)

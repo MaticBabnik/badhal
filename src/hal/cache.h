@@ -1,7 +1,7 @@
 #pragma once
 #include "badhal.h"
 
-//TODO: this is really driver/scb
+// TODO: this is really driver/scb
 
 INLINE_ALWAYS void sys_icache_enable() {
     a_dsb();
@@ -10,6 +10,14 @@ INLINE_ALWAYS void sys_icache_enable() {
     a_dsb();
     a_isb();
     SCB->CCR |= SCB_CCR_IC; // enable I-cache
+    a_dsb();
+    a_isb();
+}
+
+INLINE_ALWAYS void sys_icache_disable() {
+    a_dsb();
+    a_isb();
+    SCB->CCR &= ~SCB_CCR_IC; // disable I-cache
     a_dsb();
     a_isb();
 }

@@ -1,14 +1,14 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct CoreDebug_t {
+typedef struct {
     R_RW u32 DHCSR;
     R_WO u32 DCRSR;
     R_RW u32 DCRDR;
     R_RW u32 DEMCR;
-};
+} CoreDebug_t;
 
-struct DBGMCU_t {
+typedef struct {
     R_RW u32 IDCODE;
     R_RW u32 CR;
     u32 __reserved4[11];
@@ -21,9 +21,9 @@ struct DBGMCU_t {
     R_RW u32 APB2FZ1;
     u32 __reserved8;
     R_RW u32 APB4FZ1;
-};
+} DBGMCU_t;
 
-struct TPI_t {
+typedef struct {
     R_RO u32 SSPSR;
     R_RW u32 CSPSR;
     u32 __reserved0[2U];
@@ -48,9 +48,9 @@ struct TPI_t {
     u32 __reserved7[8U];
     R_RO u32 DEVID;
     R_RO u32 DEVTYPE;
-};
+} TPI_t;
 
-struct ITM_t {
+typedef struct {
     R_WO union {
         R_WO u8 u8;
         R_WO u16 u16;
@@ -79,7 +79,13 @@ struct ITM_t {
     R_RO u32 CID1;
     R_RO u32 CID2;
     R_RO u32 CID3;
-};
+} ITM_t;
+
+#define DBGMCU_IDCODE_REVID_Pos 16
+#define DBGMCU_IDCODE_REVID_Msk (0xFFFFul << DBGMCU_IDCODE_REVID_Pos)
+
+#define DBGMCU_IDCODE_DEVID_Pos 0
+#define DBGMCU_IDCODE_DEVID_Msk (0xFFFul << DBGMCU_IDCODE_DEVID_Pos)
 
 #define DBGMCU_CR_TRACE_IOEN 0x1
 #define CoreDebug_DEMCR_TRCENA 0x01000000

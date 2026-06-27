@@ -33,7 +33,7 @@ endif()
 
 project(BadHAL C ASM)
 
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/src)
 file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" )
 
 set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
@@ -108,5 +108,10 @@ add_custom_target(binary
 
 add_custom_target(burn
     COMMAND st-flash write ${CMAKE_CURRENT_BINARY_DIR}/badhal.bin 0x8000000
+    DEPENDS binary
+)
+
+add_custom_target(burn-reset
+    COMMAND st-flash --connect-under-reset write ${CMAKE_CURRENT_BINARY_DIR}/badhal.bin 0x8000000
     DEPENDS binary
 )

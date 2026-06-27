@@ -4,7 +4,7 @@
         {
             "name": "Cortex Debug",
             "type": "cortex-debug",
-            "request": "launch",
+            "request": "attach",
             "cwd": "${workspaceFolder}",
 
             "servertype": "openocd",

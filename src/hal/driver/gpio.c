@@ -1,7 +1,7 @@
 #include "gpio.h"
 #include "../badhal.h"
 
-u32 gpio_ref_to_index(struct GPIO_t *unit) {
+u32 gpio_ref_to_index(GPIO_t *unit) {
     return ((u32) unit & 0xffff) >> 10;
 }
 
@@ -9,12 +9,12 @@ void gpio_init_all_ports() {
     RCC->AHB4ENR |= RCC_AHB4ENR_GPIOxEN_Mask;
 }
 
-void gpio_init_port(struct GPIO_t *unit) {
+void gpio_init_port(GPIO_t *unit) {
     RCC->AHB4ENR |= 1 << gpio_ref_to_index(unit);
 }
 
 void gpio_init_output(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u8 index,
     GpioPull_t pull,
     GpioSpeed_t speed,
@@ -30,7 +30,7 @@ void gpio_init_output(
 }
 
 void gpio_init_output_mask(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u16 mask,
     GpioPull_t pull,
     GpioSpeed_t speed,
@@ -43,14 +43,14 @@ void gpio_init_output_mask(
     }
 }
 
-void gpio_init_input(struct GPIO_t *unit, u8 index, GpioPull_t pull) {
+void gpio_init_input(GPIO_t *unit, u8 index, GpioPull_t pull) {
     unit->MODER = (unit->MODER & (u32) ~(0x3ul << (index * 2)))
                   | (GM_Input << (index * 2));
     unit->PUPDR =
         (unit->PUPDR & (u32) ~(0x3ul << (index * 2))) | (pull << (index * 2));
 }
 
-void gpio_init_input_mask(struct GPIO_t *unit, u16 mask, GpioPull_t pull) {
+void gpio_init_input_mask(GPIO_t *unit, u16 mask, GpioPull_t pull) {
     for (u8 i = 0; i < 16; i++) {
         if ((1 << i) & mask) {
             gpio_init_input(unit, i, pull);
@@ -59,7 +59,7 @@ void gpio_init_input_mask(struct GPIO_t *unit, u16 mask, GpioPull_t pull) {
 }
 
 void gpio_init_alt(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u8 index,
     u8 af,
     GpioPull_t pull,
@@ -82,7 +82,7 @@ void gpio_init_alt(
 }
 
 void gpio_init_alt_mask(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u16 mask,
     u8 af,
     GpioPull_t pull,
@@ -96,12 +96,12 @@ void gpio_init_alt_mask(
     }
 }
 
-void gpio_init_analog(struct GPIO_t *unit, u8 index) {
+void gpio_init_analog(GPIO_t *unit, u8 index) {
     unit->MODER = (unit->MODER & (u32) ~(0x3ul << (index * 2)))
                   | (GM_Analog << (index * 2));
 }
 
-void gpio_init_analog_mask(struct GPIO_t *unit, u16 mask) {
+void gpio_init_analog_mask(GPIO_t *unit, u16 mask) {
 
     for (u8 i = 0; i < 16; i++) {
         if ((1 << i) & mask) {
@@ -110,21 +110,21 @@ void gpio_init_analog_mask(struct GPIO_t *unit, u16 mask) {
     }
 }
 
-bool gpio_read(struct GPIO_t *unit, u8 index) {
+bool gpio_read(GPIO_t *unit, u8 index) {
     return unit->IDR & (1 << index);
 }
 
-bool gpio_out_state(struct GPIO_t *unit, u8 index) {
+bool gpio_out_state(GPIO_t *unit, u8 index) {
     return unit->ODR & (1 << index);
 }
 
-void gpio_put(struct GPIO_t *unit, u8 index, bool value) {
+void gpio_put(GPIO_t *unit, u8 index, bool value) {
     if (value)
         unit->BSRR |= 1 << index;
     else
         unit->BSRR |= 1 << (index + 16);
 }
 
-void gpio_toggle(struct GPIO_t *unit, u8 index) {
+void gpio_toggle(GPIO_t *unit, u8 index) {
     gpio_put(unit, index, !gpio_out_state(unit, index));
 }

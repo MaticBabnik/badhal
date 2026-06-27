@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 #include "../hwdef/gpio.h"
 
 #define GPIO_0 (1ul << 0)
@@ -20,6 +20,23 @@
 #define GPIO_15 (1ul << 15)
 
 #define GPIO_ALL 0xfffful
+
+#define AF0 0ul
+#define AF1 1ul
+#define AF2 2ul
+#define AF3 3ul
+#define AF4 4ul
+#define AF5 5ul
+#define AF6 6ul
+#define AF7 7ul
+#define AF8 8ul
+#define AF9 9ul
+#define AF10 10ul
+#define AF11 11ul
+#define AF12 12ul
+#define AF13 13ul
+#define AF14 14ul
+#define AF15 15ul
 
 #define GPIO_MODE_MASK 0x3UL
 #define GPIO_MODE_SIZE 2UL
@@ -68,28 +85,28 @@ typedef enum {
 typedef enum { GP_None = 0, GP_PullUp = 1, GP_PullDown = 2 } GpioPull_t;
 
 void gpio_init_all_ports();
-void gpio_init_port(struct GPIO_t *unit);
+void gpio_init_port(GPIO_t *unit);
 
 void gpio_init_output(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u8 index,
     GpioPull_t pull,
     GpioSpeed_t speed,
     GpioOutputType_t otype
 );
 void gpio_init_output_mask(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u16 mask,
     GpioPull_t pull,
     GpioSpeed_t speed,
     GpioOutputType_t otype
 );
 
-void gpio_init_input(struct GPIO_t *unit, u8 index, GpioPull_t pull);
-void gpio_init_input_mask(struct GPIO_t *unit, u16 mask, GpioPull_t pull);
+void gpio_init_input(GPIO_t *unit, u8 index, GpioPull_t pull);
+void gpio_init_input_mask(GPIO_t *unit, u16 mask, GpioPull_t pull);
 
 void gpio_init_alt(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u8 index,
     u8 af,
     GpioPull_t pull,
@@ -97,7 +114,7 @@ void gpio_init_alt(
     GpioOutputType_t otype
 );
 void gpio_init_alt_mask(
-    struct GPIO_t *unit,
+    GPIO_t *unit,
     u16 mask,
     u8 af,
     GpioPull_t pull,
@@ -105,11 +122,11 @@ void gpio_init_alt_mask(
     GpioOutputType_t otype
 );
 
-void gpio_init_analog(struct GPIO_t *unit, u8 index);
-void gpio_init_analog_mask(struct GPIO_t *unit, u16 mask);
+void gpio_init_analog(GPIO_t *unit, u8 index);
+void gpio_init_analog_mask(GPIO_t *unit, u16 mask);
 
-bool gpio_read(struct GPIO_t *unit, u8 index);
-bool gpio_out_state(struct GPIO_t *unit, u8 index);
+bool gpio_read(GPIO_t *unit, u8 index);
+bool gpio_out_state(GPIO_t *unit, u8 index);
 
-void gpio_put(struct GPIO_t *unit, u8 index, bool value);
-void gpio_toggle(struct GPIO_t *unit, u8 index);
+void gpio_put(GPIO_t *unit, u8 index, bool value);
+void gpio_toggle(GPIO_t *unit, u8 index);

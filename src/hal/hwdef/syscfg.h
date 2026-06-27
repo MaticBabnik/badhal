@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct SYSCFG_t {
+typedef struct {
     u32 __reserved1;
     R_RW u32 PMCR;
     R_RW u32 EXTICR[4];
@@ -33,7 +33,10 @@ struct SYSCFG_t {
     R_RW u32 UR15;
     R_RW u32 UR16;
     R_RW u32 UR17;
-};
+} SYSCFG_t;
 
 #define SYSCFG_CCCSR_EN 1
 #define SYSCFG_PWRCR_ODEN 1ul
+
+#define SYSCFG_PMCR_PA0SO (1ul << 24)
+#define SYSCFG_PMCR_PA1SO (1ul << 25)

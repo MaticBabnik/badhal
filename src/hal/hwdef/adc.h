@@ -1,7 +1,7 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct ADC_t {
+typedef struct {
     R_RW u32 ISR;
     R_RW u32 IER;
     R_RW u32 CR;
@@ -44,13 +44,20 @@ struct ADC_t {
     R_RW u32 DIFSEL;
     R_RW u32 CALFACT;
     R_RW u32 CALFACT2;
-};
+} ADC_t;
+
+typedef struct {
+    R_RW u32 CSR;
+    R_RW u32 CCR;
+} ADC_Common_t;
 
 #define ADC_CR_ADEN (1ul << 0ul)
+#define ADC_CR_BOOST (1ul << 8ul)
 #define ADC_CR_ADSTART (1ul << 2ul)
 #define ADC_CR_ADVREGEN (1ul << 28ul)
 #define ADC_CR_DEEPPWD (1ul << 29ul)
 #define ADC_CR_ADCAL (1ul << 31ul)
+#define ADC_CR_JADSTART (1ul << 3)
 
 #define ADC_CFGR_JQDIS (1ul << 31ul)
 #define ADC_CFGR_CONT (1ul << 13ul)
@@ -58,3 +65,9 @@ struct ADC_t {
 #define ADC_CFGR_RES_10bit (0x3ul << 2ul)
 
 #define ADC_ISR_ADRDY (0x1ul << 0ul)
+#define ADC_ISR_JEOS (1ul << 6)
+
+#define ADC_COM_CCR_PRESC_Pos 18
+#define ADC_COM_CCR_PRESC_Mask (0xful << ADC_COM_CCR_PRESC_Pos)
+#define ADC_COM_CCR_PRESC_DIV1 (0x0ul << ADC_COM_CCR_PRESC_Pos)
+#define ADC_COM_CCR_PRESC_DIV2 (0x1ul << ADC_COM_CCR_PRESC_Pos)

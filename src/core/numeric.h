@@ -13,6 +13,9 @@ typedef int i32;
 typedef unsigned int u32;
 typedef float f32;
 
+#define KILO (1ul << 10)
+#define MEGA (1ul << 20)
+
 #define I8_MIN ((i8) 0x80)
 #define I8_MAX ((i8) 0x7f)
 #define U8_MIN ((u8) 0x00)

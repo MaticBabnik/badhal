@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
 typedef enum {
     CK_PLL_SRC_HSI = 0,

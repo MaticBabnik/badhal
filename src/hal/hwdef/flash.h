@@ -1,7 +1,7 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct FLASH_t {
+typedef struct {
     R_RW u32 ACR;
     R_RW u32 KEYR1;
     R_RW u32 OPTKEYR;
@@ -48,6 +48,6 @@ struct FLASH_t {
     R_RW u32 CRCEADD2;
     R_RW u32 CRCDATA2;
     R_RW u32 ECC_FA2;
-};
+} FLASH_t;
 
 #define FLASH_ACR_LATENCTY_Mask 0xFUL

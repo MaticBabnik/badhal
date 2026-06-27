@@ -1,7 +1,7 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct LTDC_t {
+typedef struct {
     u32 reserved0[2];
     R_RW u32 SSCR;
     R_RW u32 BPCR;
@@ -19,9 +19,9 @@ struct LTDC_t {
     R_RW u32 LIPCR;
     R_RW u32 CPSR;
     R_RW u32 CDSR;
-};
+} LTDC_t;
 
-struct LTDC_Layer_t {
+typedef struct {
     R_RW u32 CR;
     R_RW u32 WHPCR;
     R_RW u32 WVPCR;
@@ -35,9 +35,35 @@ struct LTDC_Layer_t {
     R_RW u32 CFBLR;
     R_RW u32 CFBLNR;
     u32 reserved1[3];
-    R_RW u32 CLUTWR;
-};
+    R_WO u32 CLUTWR;
+} LTDC_Layer_t;
 
+#define LTDC_GCR_Pol_High 1ul
+#define LTDC_GCR_Pol_Low 0ul
+
+#define LTDC_GCR_HSPOL_Pos 31
+#define LTDC_GCR_VSPOL_Pos 30
+#define LTDC_GCR_DEPOL_Pos 29
+#define LTDC_GCR_PCPOL_Pos 28
+
+#define LTDC_GCR_DEN_Pos 16
+#define LTDC_GCR_DEN (1ul << LTDC_GCR_DEN_Pos)
+#define LTDC_GCR_DRW_Pos 12
+#define LTDC_GCR_DGW_Pos 8
+#define LTDC_GCR_DBW_Pos 4
+#define LTDC_GCR_DxW_UMask (0x7ul)
+
+#define LTDC_GCR_DRW_Mask (LTDC_GCR_DxW_UMask << LTDC_GCR_DRW_Pos)
+#define LTDC_GCR_DGW_Mask (LTDC_GCR_DxW_UMask << LTDC_GCR_DGW_Pos)
+#define LTDC_GCR_DBW_Mask (LTDC_GCR_DxW_UMask << LTDC_GCR_DBW_Pos)
+
+#define LTD_GCR_LTDCEN 1ul
+
+#define LTDC_IER_LIE (1ul << 0)
+#define LTDC_ICR_CLIF (1ul << 0)
+
+#define LTDC_SRCR_IMR (1ul << 0)
+#define LTDC_SRCR_VBR (1ul << 1)
 
 #define LTDC_SSCR_HSW_Pos 16
 #define LTDC_SSCR_VSH_Pos 0
@@ -51,7 +77,6 @@ struct LTDC_Layer_t {
 #define LTDC_LxCR_LEN (1ul << 0)
 #define LTDC_LxCR_COLKEN (1ul << 1)
 #define LTDC_LxCR_CLUTEN (1ul << 4)
-
 
 #define LTDC_LxWHPCR_Stop_Pos 16
 #define LTDC_LxWHPCR_Start_Pos 0
@@ -71,5 +96,5 @@ struct LTDC_Layer_t {
 #define LTDC_LxCFBLR_CFBP_Pos 16
 #define LTDC_LxCFBLR_CFBLL_Pos 0
 
-#define LTDC_IER_LIE (1ul << 0)
-#define LTDC_ICR_CLIF (1ul << 0)
+#define LTDC_LxBFCR_BF2_Pos 0
+#define LTDC_LxBFCR_BF1_Pos 8

@@ -1,1 +1,3 @@
 build
+tool/badfs-tools/build
+tool/badfs-tools/fs*

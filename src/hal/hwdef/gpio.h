@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct GPIO_t {
+typedef struct {
     R_RW u32 MODER;   // Mode register
     R_RW u32 OTYPER;  // Output type
     R_RW u32 OSPEEDR; // Output spped
@@ -12,4 +12,4 @@ struct GPIO_t {
     R_RW u32 BSRR;    // Bit Set/Reset
     R_RW u32 LCKR;    // Lock
     R_RW u32 AFR[2];  // Alternate function
-};
+} GPIO_t;

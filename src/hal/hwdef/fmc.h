@@ -1,11 +1,11 @@
 #pragma once
-#include "../core/bad.h"
+#include <core/bad.h>
 
-struct FMC_Bank1_t {
+typedef struct {
     R_RW u32 BTCR[8];
-};
+} FMC_Bank1_t;
 
-struct FMC_Bank5_6_t {
+typedef struct {
     R_RW u32 SDCRL;
     R_RW u32 SDCRH;
     R_RW u32 SDTRL;
@@ -14,4 +14,4 @@ struct FMC_Bank5_6_t {
     R_RW u32 SDCMR;
     R_RW u32 SDRTR;
     R_RW u32 SDSR;
-};
+} FMC_Bank5_6_t;

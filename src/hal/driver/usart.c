@@ -9,10 +9,10 @@ void usart_use_hsi() {
 
     usart_freq = 64000000ul;
     RCC->D2CCIP2R = (RCC->D2CCIP2R & ~RCC_D2CCIP2R_USART234578SEL_Mask)
-                    | RCC_D2CCOP2R_USART234578SEL_HSI;
+                    | RCC_D2CCIP2R_USART234578SEL_HSI;
 }
 
-void usart_setup_basic(struct USART_t *usart, u32 baudrate) {
+void usart_setup_basic(USART_t *usart, u32 baudrate) {
     if (usart == USART3) {
         RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
 
@@ -33,21 +33,21 @@ void usart_setup_basic(struct USART_t *usart, u32 baudrate) {
     }
 }
 
-char usart_recv(struct USART_t *usart) {
+char usart_recv(USART_t *usart) {
     // wait for input
     while (!(usart->ISR & USART_ISR_RXNE))
         ;
     return (char) usart->RDR;
 }
 
-void usart_send(struct USART_t *usart, char chr) {
+void usart_send(USART_t *usart, char chr) {
     while (!(usart->ISR & USART_ISR_TXE))
         ;
 
     usart->TDR = (u32) chr;
 }
 
-void usart_send_string(struct USART_t *usart, const char *string) {
+void usart_send_string(USART_t *usart, const char *string) {
     while (true) {
         char chr = *(string++);
         if (!chr) return;

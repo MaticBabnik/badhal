@@ -5,9 +5,11 @@
         ".clang-format": "yaml"
     },
     "[c]": {
-        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.defaultFormatter": "xaver.clang-format"
     },
     "[cpp]": {
-        "editor.defaultFormatter": "xaver.clang-format",
-    }
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "vscode-serial-monitor.customBaudRates": [460800, 921600]
 }
