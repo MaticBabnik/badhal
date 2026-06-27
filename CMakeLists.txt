@@ -36,7 +36,7 @@ project(BadHAL C ASM)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 file(GLOB_RECURSE srcs "${CMAKE_SOURCE_DIR}/src/*.c" )
 
-set(LINK_MODE "FLASH" CACHE STRING "Store to FLASH or RAM?")
+set(LINKER_SCRIPT_NAME "badhal_flash.ld" CACHE STRING "Linker script filename, looked up in linker/")
 
 set(CPU_FLAGS 
     -mthumb 
@@ -90,7 +90,7 @@ message(STATUS "Using linker: ${CMAKE_LINKER}")
 message(STATUS "Flags\nC: ${CMAKE_C_FLAGS}\nLinker: ${CMAKE_EXE_LINKER_FLAGS}")
 
 # Linker
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/linker/STM32H750XBHX_${LINK_MODE}.ld)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/linker/${LINKER_SCRIPT_NAME})
 
 add_executable(badhal ${srcs})
 

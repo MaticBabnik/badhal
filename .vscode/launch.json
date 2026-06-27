@@ -2,38 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Cortex Debug",
+            "name": "Run",
             "type": "cortex-debug",
-            "request": "attach",
+            "request": "launch",
             "cwd": "${workspaceFolder}",
 
             "servertype": "openocd",
             "runToEntryPoint": "entry",
             "executable": "./build/badhal",
-            
+
             "device": "STM32H750X",
             "svdFile": "${workspaceFolder}/STM32H750.svd",
-            "configFiles": ["board/stm32h750b-disco.cfg"],
+            "configFiles": ["board/stm32h750b-disco.cfg"]
+        },
+        {
+            "name": "Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
 
-            "liveWatch": {
-                "enabled": true,
-                "samplesPerSecond": 4,
-            },
+            "servertype": "openocd",
+            "executable": "./build/badhal",
 
-            // "swoConfig": {
-            //     "enabled": true,
-            //     "source": "probe",
-            //     "swoFrequency": 2000000,
-            //     "cpuFrequency": 400000000,
-            //     "decoders": [
-            //         {
-            //             "type": "console",
-            //             "label": "ITM",
-            //             "port": 0,
-            //             "encoding": "ascii"
-            //         }
-            //     ]
-            // }
+            "device": "STM32H750X",
+            "svdFile": "${workspaceFolder}/STM32H750.svd",
+            "configFiles": ["board/stm32h750b-disco.cfg"]
         }
     ]
 }

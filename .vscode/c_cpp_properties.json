@@ -3,7 +3,7 @@
         {
             "name": "ARM32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/src/**"
             ],
             "defines": [],
             "cStandard": "c23",

@@ -6,7 +6,6 @@ A Hobby-grade HAL/BSP for the STM32-H750-disco board.
 
 - [ ] Tune memory timings
 - [ ] Doom
-- [ ] Figure out licenses/rewrite stolen code (mostly the linker script)
 - [ ] Ethernet + network stack
 - [ ] UDP pixelflut
 - [ ] Build a pixelflut wall @ DCTF27 or something.

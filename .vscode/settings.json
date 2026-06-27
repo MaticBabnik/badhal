@@ -1,5 +1,8 @@
 {
     "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.modifyLists.addNewSourceFiles": "no",
+    "cmake.modifyLists.removeDeletedSourceFiles": "no",
     "cortex-debug.variableUseNaturalFormat": false,
     "files.associations": {
         ".clang-format": "yaml"
@@ -10,6 +13,5 @@
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
     },
-    "C_Cpp.errorSquiggles": "disabled",
-    "vscode-serial-monitor.customBaudRates": [460800, 921600]
+    "vscode-serial-monitor.customBaudRates": [460800, 921600],
 }
