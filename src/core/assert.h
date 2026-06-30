@@ -6,7 +6,7 @@
 
 #ifdef RTASSERT
 
-extern void sys_trap(const char *msg);
+void sys_trap(const char *msg);
 
 #define ASSERT(expr, msg)                                                      \
     do {                                                                       \

@@ -207,7 +207,7 @@ PERFORMANCE vs MSVC 2008 32-/64-bit (GCC is even slower than MSVC):
 #endif
 
 #include <stdarg.h> // for va_arg(), va_list()
-#include <stddef.h> // size_t, ptrdiff_t
+#include <core/stdbad/stddef.h> // size_t, ptrdiff_t
 
 #ifndef STB_SPRINTF_MIN
 #define STB_SPRINTF_MIN 512 // how many characters per callback

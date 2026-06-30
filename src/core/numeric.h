@@ -11,7 +11,10 @@ typedef short i16;
 typedef unsigned short u16;
 typedef int i32;
 typedef unsigned int u32;
+typedef long long i64;
+typedef unsigned long long u64;
 typedef float f32;
+typedef double f64;
 
 #define KILO (1ul << 10)
 #define MEGA (1ul << 20)
@@ -39,7 +42,10 @@ typedef float f32;
 
 DECLARE_MIN_MAX(i32)
 DECLARE_MIN_MAX(u32)
+DECLARE_MIN_MAX(i64)
+DECLARE_MIN_MAX(u64)
 DECLARE_MIN_MAX(f32)
+DECLARE_MIN_MAX(f64)
 
 #undef DECLARE_MIN_MAX
 

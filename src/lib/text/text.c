@@ -1,5 +1,6 @@
 #include "text.h"
 #include "font.h"
+#include <core/stdbad/stddef.h>
 
 const u8 *get_char(char c) {
     if (c < 33 || c > 127) {

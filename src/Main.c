@@ -606,3 +606,6 @@ u32 loader_cb_read(u32 addr, u8 *data, u32 n) {
     qspi_read_bytes(data, n);
     return 0;
 }
+
+
+#include <core/stdbad/string.h>
